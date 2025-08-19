@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Smart_road" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary colors -->
+
+        <item name="colorPrimaryVariant">#444444</item>
+
+
+        <!-- Secondary colors -->
+        <item name="colorSecondary">#444444</item>
+        <item name="colorSecondaryVariant">#2C2C2C</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Background and surface colors -->
+        <item name="android:windowBackground">@color/background_light</item>
+
+
+        <!-- Card colors -->
+        <item name="colorCardBackground">@color/card_background_light</item>
+        <item name="colorCardText">@color/card_text_light</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="emptyStateIconTint">@color/empty_state_icon_tint_light</item>
+
+        <item name="cardBackgroundColor">@color/card_background_color</item>
+        <item name="cardTextColor">@color/card_text_color</item>
+
+
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/gray_900</item>
+        <item name="colorPrimaryContainer">@color/purple_200</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Surface colors -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/gray_100</item>
+        <item name="colorOnSurface">@color/black</item>
+
+        <!-- Outline -->
+        <item name="colorOutline">@color/gray_100</item>
+
+
+        <item name="colorCardSelected">@color/card_selected_color</item>
+        <item name="colorOnCardText">?attr/colorOnSurface</item>
+        <item name="colorCardStroke">?attr/colorOutline</item>
+
+    </style>
+    <style name="CustomAlertDialogTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:textColorPrimary">#000000</item> <!-- Тёмный текст -->
+        <item name="android:textColor">#000000</item>
+        <item name="android:background">#FFFFFF</item> <!-- Белый фон -->
+    </style>
+</resources>

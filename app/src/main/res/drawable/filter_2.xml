@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Фон знака (треугольник предупреждения) -->
+
+
+    <!-- Обводка треугольника -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M1,21 L12,2 L23,21 Z" />
+
+    <!-- Волнистая линия (неровная дорога) -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M7,18
+                          C8,14 9,10 12,12
+                          C15,14 16,18 17,14" />
+
+</vector>

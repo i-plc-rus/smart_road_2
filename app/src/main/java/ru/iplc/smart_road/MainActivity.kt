@@ -1,0 +1,288 @@
+package ru.iplc.smart_road
+
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import com.yandex.mapkit.MapKitFactory
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupWithNavController
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.launch
+import ru.iplc.smart_road.auth.LoginActivity
+import ru.iplc.smart_road.auth.ProfileActivity
+import ru.iplc.smart_road.data.local.TokenManager
+import ru.iplc.smart_road.databinding.ActivityMainBinding
+import ru.iplc.smart_road.service.PotholeDataService
+import ru.iplc.smart_road.utils.schedulePotholeUpload
+import ru.iplc.smart_road.worker.PotholeUploadWorker
+
+//import org.koin.android.ext.android.inject
+import io.sentry.Sentry
+
+
+
+class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
+
+    private lateinit var navController: NavController
+    private lateinit var tokenManager: TokenManager
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var appBarConfiguration: AppBarConfiguration
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    // waiting for view to draw to better represent a captured error with a screenshot
+    findViewById<android.view.View>(android.R.id.content).viewTreeObserver.addOnGlobalLayoutListener {
+      try {
+        throw Exception("This app uses Sentry! :)")
+      } catch (e: Exception) {
+        Sentry.captureException(e)
+      }
+    }
+
+        MapKitFactory.initialize(this.applicationContext) // Используем applicationContext
+
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Запускаем планировщик отправки данных
+        schedulePotholeUpload(this, this)
+        //для теста разово
+        val testRequest = OneTimeWorkRequestBuilder<PotholeUploadWorker>().build()
+        WorkManager.getInstance(this).enqueue(testRequest)
+
+        /*val intent = Intent(this, PotholeDataService::class.java)
+        startService(intent)*/
+
+
+        tokenManager = TokenManager(this)
+        lifecycleScope.launch {
+            setupNavigation()
+        }
+
+
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        bottomNav.setupWithNavController(navController)
+        val navView = findViewById<NavigationView>(R.id.nav_view)
+        navView.setupWithNavController(navController)
+
+        // Кастомный обработчик для пунктов меню
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_settings -> {
+                    navController.navigate(R.id.nav_settings)
+                    binding.drawerLayout.closeDrawer(navView)
+                    true
+                }
+                R.id.nav_profile -> {
+                    //navigateToLogin()
+                    navController.navigate(R.id.nav_login)
+                    binding.drawerLayout.closeDrawer(navView)
+                    true
+                }
+                R.id.nav_garage -> {
+                    navController.navigate(R.id.nav_garage)
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                    true
+                }
+
+                R.id.nav_bill -> {
+                    navController.navigate(R.id.nav_bill)
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                    true
+                }
+                R.id.nav_exit -> {
+                    AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
+                        .setTitle("Выход")
+                        .setMessage("Вы действительно хотите выйти из приложения?")
+                        .setPositiveButton("Да") { _, _ ->
+                            finishAffinity() // Полностью закрыть приложение
+                        }
+                        .setNegativeButton("Отмена", null)
+                        .show()
+
+                    binding.drawerLayout.closeDrawer(navView)
+                    true
+                }
+                else -> {
+                    // Стандартное поведение NavigationUI
+                    false
+                }
+            }
+        }
+        //checkLocationPermissions()
+        checkPermissions()
+    }
+    private fun checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+        else{
+            startPotholeService()
+        }
+    }
+
+    private fun checkPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        )
+
+        val notGranted = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (notGranted.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, notGranted.toTypedArray(), LOCATION_PERMISSION_REQUEST_CODE)
+        } else {
+            startPotholeService() // запускаем сбор данных
+        }
+    }
+
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                startPotholeService()
+            } else {
+                Toast.makeText(this, "Нужны разрешения для работы сервиса", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    /** Запуск сервиса */
+    private fun startPotholeService() {
+        schedulePotholeUpload(this, this)
+        val intent = Intent(this, PotholeDataService::class.java)
+        startForegroundService(intent)
+    }
+
+    private suspend fun setupNavigation() {
+        navController = findNavController(R.id.nav_host_fragment)
+
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_home,  // Домашний экран
+                R.id.nav_garage,
+                R.id.nav_settings_device
+            ),
+            binding.drawerLayout
+        )
+
+        // Настройка BottomNavigation
+        binding.bottomNav.setupWithNavController(navController)
+
+        // Настройка NavigationView (правого меню)
+        binding.navView.setupWithNavController(navController)
+
+        // Обработчик пунктов меню
+        binding.navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_settings -> {
+                    navController.navigate(R.id.nav_settings)
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                    true
+                }
+                R.id.nav_garage -> {
+                    navController.navigate(R.id.nav_garage)
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                    true
+                }
+                R.id.nav_home -> {
+                    navController.navigate(R.id.nav_home)
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                    true
+                }
+                /*R.id.nav_profile_activity -> {
+                    navigateToLogin()
+                    true
+                }*/
+                else -> false
+            }
+        }
+    }
+
+    //private fun navigateToLogin() {
+        //startActivity(Intent(this, LoginActivity::class.java))
+        //finish()
+    //}
+
+    /*private fun performLogout() {
+        lifecycleScope.launch {
+            tokenManager.clearTokens()
+            navigateToLogin()
+        }
+    }*/
+
+
+    override fun onSupportNavigateUp(): Boolean {
+        //val navController = findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Остановить фоновый сервис при уничтожении активности (при смахивании)
+        val intent = Intent(this, PotholeDataService::class.java)
+        stopService(intent)
+    }
+
+
+    fun openDrawer() {
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        if (!drawerLayout.isDrawerOpen(GravityCompat.END)) {
+            drawerLayout.openDrawer(GravityCompat.END)
+        }
+    }
+
+}
+

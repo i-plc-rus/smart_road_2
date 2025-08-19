@@ -1,0 +1,17 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Неактивная плитка (темнее) -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#e6e5e5"/>
+            <corners android:radius="1dp"/>
+        </shape>
+    </item>
+
+    <!-- Активная плитка (светлее) -->
+    <item android:state_selected="false">
+        <shape android:shape="rectangle">
+            <solid android:color="#fafafa"/>
+            <corners android:radius="1dp"/>
+        </shape>
+    </item>
+</selector>

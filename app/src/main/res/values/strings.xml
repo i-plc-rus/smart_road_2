@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Умные дороги</string>
+    <string name="title_activity_main">MainActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Настройка датчиков и положения устройства в автомобиле</string>
+
+    <string name="error_email_empty">Please enter your email</string>
+    <string name="error_email_invalid">Please enter a valid email</string>
+    <string name="error_password_empty">Please enter your password</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_invalid_credentials">Invalid email or password</string>
+    <string name="error_network_timeout">Network error. Please try again</string>
+    <string name="error_login_failed">Login failed: %1$s</string>
+
+    <string name="error_name_empty">Please enter your username</string>
+    <string name="error_fio_empty">Please enter your fio</string>
+    <string name="error_phone_empty">Please enter your phone</string>
+
+    <string name="error_confirm_password_empty">Please confirm your password</string>
+    <string name="error_passwords_not_match">Passwords don\'t match</string>
+    <string name="error_email_already_registered">Email already registered</string>
+
+    <string name="error_registration_failed">Registration failed: %1$s</string>
+    <string name="registration_success">Registration successful</string>
+    <string name="default_stat_label">Категория</string>
+
+    <string name="vin_format">VIN: %s</string>
+    <string name="year_format">Год: %d</string>
+    <string name="set_default">По умолчанию</string>
+    <string name="default_selected">✓ По умолчанию</string>
+
+</resources>

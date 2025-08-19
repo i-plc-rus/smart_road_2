@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StatsItem">
+        <attr name="statValue" format="integer" />
+        <attr name="statLabel" format="string" />
+    </declare-styleable>
+
+        <attr name="colorCardBackground" format="reference|color"/>
+        <attr name="colorCardText" format="reference|color"/>
+        <attr name="emptyStateIconTint" format="reference|color"/>
+    <attr name="cardBackgroundColor" format="reference|color" />
+    <attr name="cardTextColor" format="reference|color" />
+
+
+    <attr name="colorCardSelected" format="reference|color"/>
+    <attr name="colorOnCardText" format="reference|color"/>
+    <attr name="colorCardStroke" format="reference|color"/>
+
+</resources>

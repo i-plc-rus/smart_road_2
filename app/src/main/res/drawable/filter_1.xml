@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <!-- Красный треугольник с закруглёнными углами -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#D32F2F"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round"
+        android:pathData="M24,4 L44,44 H4 Z" />
+
+    <!-- Волнистая «горка» -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="
+            M12,33
+            q4,-12 8,-12
+            q4,0 8,12" />
+
+</vector>
