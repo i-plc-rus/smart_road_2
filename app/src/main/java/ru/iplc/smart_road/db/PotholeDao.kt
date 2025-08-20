@@ -12,8 +12,9 @@ interface PotholeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(data: List<PotholeData>)
 
-    @Query("SELECT * FROM pothole_data WHERE isSent = 0  ORDER BY timestamp ASC LIMIT(:limit)")
-    suspend fun getUnsentBatch(limit: Int): List<PotholeData>
+    @Query("SELECT * FROM pothole_data WHERE isSent = 0 ORDER BY timestamp ASC LIMIT :limit OFFSET :offset")
+    suspend fun getUnsentBatch(limit: Int, offset: Int): List<PotholeData>
+
 
     @Query("SELECT * FROM pothole_data ORDER BY timestamp ASC")
     suspend fun getAll(): List<PotholeData>

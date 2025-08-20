@@ -5,15 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<com.google.android.material.appbar.MaterialToolbar
-    android:id="@+id/toolbarSettings"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
-    app:titleTextColor="?attr/colorOnPrimary"
-    app:navigationIcon="?attr/homeAsUpIndicator"
-    app:navigationIconTint="?attr/colorOnPrimary"
-    app:iconTint="?attr/colorOnPrimary"/>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarSettings"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="?attr/colorOnPrimary"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:navigationIconTint="?attr/colorOnPrimary"
+        />
+
 
 
 <LinearLayout
@@ -28,7 +29,7 @@
 
     <TextView
         android:id="@+id/version"
-        android:text="v 2.1.13"
+        android:text="v 2.1.14"
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

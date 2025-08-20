@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.work.BackoffPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -24,6 +25,7 @@ import ru.iplc.smart_road.R
 import ru.iplc.smart_road.databinding.FragmentGarageBinding
 import ru.iplc.smart_road.databinding.FragmentSettingsBinding
 import ru.iplc.smart_road.worker.PotholeUploadWorker
+import java.util.concurrent.TimeUnit
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -101,36 +103,53 @@ class SettingsFragment : Fragment() {
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_send -> {
-                        // Создаем и запускаем воркер для отправки данных
+                        val workManager = WorkManager.getInstance(requireContext())
+
                         val uploadRequest = OneTimeWorkRequestBuilder<PotholeUploadWorker>()
+                            .setBackoffCriteria(
+                                BackoffPolicy.EXPONENTIAL,
+                                10, TimeUnit.SECONDS
+                            )
                             .build()
 
-                        WorkManager.getInstance(requireContext())
-                            .enqueue(uploadRequest)
+                        // Используем уникальную работу, чтобы не создавать несколько параллельных воркеров
+                        workManager.enqueueUniqueWork(
+                            "pothole_upload_work",
+                            androidx.work.ExistingWorkPolicy.KEEP,
+                            uploadRequest
+                        )
 
                         Toast.makeText(requireContext(), "Начата отправка данных...", Toast.LENGTH_SHORT).show()
 
-                        // Можно добавить наблюдение за статусом работы
-                        WorkManager.getInstance(requireContext())
-                            .getWorkInfoByIdLiveData(uploadRequest.id)
+                        workManager.getWorkInfoByIdLiveData(uploadRequest.id)
                             .observe(viewLifecycleOwner) { workInfo ->
                                 when (workInfo?.state) {
-                                    WorkInfo.State.SUCCEEDED -> {
-                                        // Успешная отправка
-                                        Toast.makeText(requireContext(), "Данные отправлены", Toast.LENGTH_SHORT).show()
+                                    androidx.work.WorkInfo.State.SUCCEEDED -> {
+                                        Toast.makeText(requireContext(), "Данные успешно отправлены", Toast.LENGTH_SHORT).show()
                                     }
-                                    WorkInfo.State.FAILED -> {
-                                        // Ошибка отправки
-                                        Toast.makeText(requireContext(), "Ошибка отправки", Toast.LENGTH_SHORT).show()
+                                    androidx.work.WorkInfo.State.FAILED -> {
+                                        val error = workInfo.outputData.getString("error_message")
+                                        Toast.makeText(requireContext(), "Ошибка отправки: $error", Toast.LENGTH_LONG).show()
                                     }
-                                    else -> {}
+                                    androidx.work.WorkInfo.State.ENQUEUED,
+                                    androidx.work.WorkInfo.State.RUNNING,
+                                    androidx.work.WorkInfo.State.BLOCKED -> {
+                                        // Можно показать индикатор прогресса
+                                    }
+                                    androidx.work.WorkInfo.State.CANCELLED, null -> {
+                                        // Можно игнорировать или показать уведомление
+                                        Toast.makeText(requireContext(), "Отправка отменена", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             }
+
+
                         true
                     }
                     else -> false
                 }
             }
+
         }
     }
 
