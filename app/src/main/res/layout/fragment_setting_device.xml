@@ -48,12 +48,7 @@
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_cradle"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Кредле"/>
+
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -104,12 +99,7 @@
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/outline_adjust_24"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Dashboard"/>
+
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -160,12 +150,7 @@
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_arrow_down"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Tunnel"/>
+
 
                 <LinearLayout
                     android:layout_width="0dp"
