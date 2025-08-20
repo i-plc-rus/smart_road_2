@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -95,12 +97,35 @@ class SettingsFragment : Fragment() {
             // Подключаем меню
             inflateMenu(R.menu.menu_settings)
 
+
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_send -> {
-                        // для теста разово
-                        val testRequest = OneTimeWorkRequestBuilder<PotholeUploadWorker>().build()
-                        WorkManager.getInstance(requireContext()).enqueue(testRequest)
+                        // Создаем и запускаем воркер для отправки данных
+                        val uploadRequest = OneTimeWorkRequestBuilder<PotholeUploadWorker>()
+                            .build()
+
+                        WorkManager.getInstance(requireContext())
+                            .enqueue(uploadRequest)
+
+                        Toast.makeText(requireContext(), "Начата отправка данных...", Toast.LENGTH_SHORT).show()
+
+                        // Можно добавить наблюдение за статусом работы
+                        WorkManager.getInstance(requireContext())
+                            .getWorkInfoByIdLiveData(uploadRequest.id)
+                            .observe(viewLifecycleOwner) { workInfo ->
+                                when (workInfo?.state) {
+                                    WorkInfo.State.SUCCEEDED -> {
+                                        // Успешная отправка
+                                        Toast.makeText(requireContext(), "Данные отправлены", Toast.LENGTH_SHORT).show()
+                                    }
+                                    WorkInfo.State.FAILED -> {
+                                        // Ошибка отправки
+                                        Toast.makeText(requireContext(), "Ошибка отправки", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else -> {}
+                                }
+                            }
                         true
                     }
                     else -> false

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -33,6 +34,8 @@ import ru.iplc.smart_road.databinding.ActivityMainBinding
 import ru.iplc.smart_road.service.PotholeDataService
 import ru.iplc.smart_road.utils.schedulePotholeUpload
 import ru.iplc.smart_road.worker.PotholeUploadWorker
+import android.provider.Settings
+import android.net.Uri
 
 //import org.koin.android.ext.android.inject
 import io.sentry.Sentry
@@ -133,8 +136,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         //checkLocationPermissions()
-        checkPermissions()
+        checkAndRequestPermissions()
+        //requestBatteryOptimizationIgnore()
     }
+
     private fun checkLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
@@ -153,46 +158,70 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkPermissions() {
-        val permissions = arrayOf(
+    private fun requestBatteryOptimizationIgnore() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent()
+            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
+    }
+
+    private fun checkAndRequestPermissions() {
+        val requiredPermissions = mutableListOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        val notGranted = permissions.filter {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requiredPermissions += Manifest.permission.ACTIVITY_RECOGNITION
+            requiredPermissions += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        }
+
+        val notGranted = requiredPermissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
         if (notGranted.isNotEmpty()) {
-            ActivityCompat.requestPermissions(this, notGranted.toTypedArray(), LOCATION_PERMISSION_REQUEST_CODE)
+            ActivityCompat.requestPermissions(
+                this,
+                notGranted.toTypedArray(),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         } else {
-            startPotholeService() // запускаем сбор данных
+            // все разрешения уже есть
+            startPotholeService()
         }
     }
 
-
-
+    // обработка результата запроса
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        permissions: Array<String>,
+        permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+            val allGranted = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+            if (allGranted) {
                 startPotholeService()
             } else {
-                Toast.makeText(this, "Нужны разрешения для работы сервиса", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Для работы приложения нужны разрешения", Toast.LENGTH_LONG).show()
             }
         }
     }
 
+
     /** Запуск сервиса */
     private fun startPotholeService() {
         schedulePotholeUpload(this, this)
-        val intent = Intent(this, PotholeDataService::class.java)
-        startForegroundService(intent)
+        val serviceIntent = Intent(this, PotholeDataService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
     }
 
     private suspend fun setupNavigation() {
@@ -282,6 +311,18 @@ class MainActivity : AppCompatActivity() {
         if (!drawerLayout.isDrawerOpen(GravityCompat.END)) {
             drawerLayout.openDrawer(GravityCompat.END)
         }
+    }
+
+    fun toggleService(start: Boolean) {
+        if (start) {
+            checkAndRequestPermissions()
+        } else {
+            stopPotholeService()
+        }
+    }
+    fun stopPotholeService() {
+        val intent = Intent(this, PotholeDataService::class.java)
+        stopService(intent)
     }
 
 }

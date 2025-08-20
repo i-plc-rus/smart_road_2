@@ -1,12 +1,17 @@
 package ru.iplc.smart_road.ui
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import com.google.android.material.card.MaterialCardView
 import com.yandex.mapkit.Animation
@@ -20,9 +25,15 @@ import com.yandex.mapkit.user_location.UserLocationView
 import com.yandex.runtime.image.ImageProvider
 import ru.iplc.smart_road.MainActivity
 import ru.iplc.smart_road.R
+import ru.iplc.smart_road.databinding.FragmentHomeBinding
+import ru.iplc.smart_road.service.PotholeDataService
+import ru.iplc.smart_road.utils.schedulePotholeUpload
 import kotlin.math.abs
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment() {
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     companion object {
         private const val TAG = "HomeFragment"
 
@@ -39,6 +50,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var isStatsExpanded = false
 
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "Fragment initialized")
@@ -48,7 +68,64 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupButtons(view)
 
         setupStatsPanel(view)
+        setupTelemetryControls()
+        setupTelemetryButton()
+        binding.telemetryToggle.isSelected = true
     }
+
+    private fun setupTelemetryButton() {
+        binding.telemetryToggle.setOnClickListener {
+            binding.telemetryToggle.isSelected = !binding.telemetryToggle.isSelected
+
+            if (binding.telemetryToggle.isSelected) {
+                // Включено
+                (requireActivity() as MainActivity).toggleService(true)
+                Toast.makeText(requireContext(), "Сбор данных запущен", Toast.LENGTH_SHORT).show()
+            } else {
+                // Выключено
+                (requireActivity() as MainActivity).toggleService(false)
+                Toast.makeText(requireContext(), "Сбор данных остановлен", Toast.LENGTH_SHORT).show()
+            }
+        }
+        updateButtonState()
+    }
+
+
+    private fun setupTelemetryControls() {
+        binding.telemetryToggle.setOnClickListener {
+//            if (TelemetryManager.isTelemetryRunning()){
+//                TelemetryManager.stopTelemetryCollection(requireContext())
+//                updateButtonState()
+//                Toast.makeText(requireContext(), "Сбор данных остановлен", Toast.LENGTH_SHORT).show()
+//            }else
+//            {
+//                TelemetryManager.startTelemetryCollection(requireContext())
+//                updateButtonState()
+//                Toast.makeText(requireContext(), "Сбор данных запущен", Toast.LENGTH_SHORT).show()
+//            }
+
+        }
+
+        /*binding.telemetryToggle.setOnClickListener {
+            TelemetryManager.stopTelemetryCollection(requireContext())
+            updateButtonState()
+            Toast.makeText(requireContext(), "Сбор данных остановлен", Toast.LENGTH_SHORT).show()
+        }*/
+    }
+
+    private fun updateButtonState() {
+        // Обновляем состояние кнопок
+        //binding.telemetryToggle.isEnabled = !TelemetryManager.isTelemetryRunning()
+        //binding.telemetryToggle.isEnabled = TelemetryManager.isTelemetryRunning()
+        //binding.telemetryToggle.isSelected = TelemetryManager.isTelemetryRunning()
+
+//        binding.telemetryToggle.text = if (TelemetryManager.isTelemetryRunning()) {
+//            "Статус: Сбор данных активен ✅"
+//        } else {
+//            "Статус: Сбор данных остановлен ⏸️"
+//        }
+    }
+
 
     private fun setupStatsPanel(view: View) {
         val statsCard = view.findViewById<MaterialCardView>(R.id.stats_card)

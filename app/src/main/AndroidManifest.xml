@@ -11,6 +11,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
 
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
     <uses-feature android:name="android.hardware.location" android:required="false" />
@@ -45,12 +51,22 @@
         <activity android:name=".auth.ProfileActivity" />
         <service android:name=".service.PotholeDataService"
             android:foregroundServiceType="location"
+            android:enabled="true"
             android:exported="false"
             />
         <service
             android:name="androidx.work.impl.background.systemjob.SystemJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
              />
+
+        <receiver android:name=".service.ServiceRestartReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
+            </intent-filter>
+        </receiver>
 
 
     

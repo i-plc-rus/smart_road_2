@@ -15,6 +15,7 @@ import ru.iplc.smart_road.data.model.PotholeData
 import ru.iplc.smart_road.data.model.PotholeDataRequest
 import ru.iplc.smart_road.data.model.RegisterRequest
 import ru.iplc.smart_road.data.model.User
+import java.util.concurrent.TimeUnit
 
 interface ApiService {
     @POST("d4ecg0afm0a6m8547i10")
@@ -36,6 +37,9 @@ interface ApiService {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(
                     OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
                         .addInterceptor(HttpLoggingInterceptor().apply {
                             level = HttpLoggingInterceptor.Level.BODY
                         })

@@ -3,6 +3,8 @@ package ru.iplc.smart_road.worker
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import retrofit2.HttpException
 import ru.iplc.smart_road.data.local.TokenManager
@@ -11,57 +13,74 @@ import ru.iplc.smart_road.data.remote.ApiService
 import ru.iplc.smart_road.db.AppDatabase
 import java.io.IOException
 
+
 class PotholeUploadWorker(
     appContext: Context,
     params: WorkerParameters
 ) : CoroutineWorker(appContext, params) {
 
     private val dao = AppDatabase.getInstance(appContext).potholeDao()
-    private val api = ApiService.create() // см. ниже
+    private val api = ApiService.create()
     private val tokenManager = TokenManager(appContext)
 
-
     override suspend fun doWork(): Result {
-        try {
+        return try {
             val userIdStr = tokenManager.getUserId()
-            var userId = userIdStr?.toIntOrNull()
+            val userId = userIdStr?.toIntOrNull() ?: 0
 
-            if (userId == null) {
+            if (userId == 0) {
                 Log.e("PotholeUploadWorker", "Не удалось получить user_id")
-                userId = 0
+                return Result.failure()
             }
 
-            while (true) {
-                //val dataBatch = dao.getAll().take(1000)
-                val dataBatch = dao.getUnsentBatch(5000)
-                if (dataBatch.isEmpty()) {
-                    Log.d("PotholeUploadWorker", "База пуста, работа завершена")
-                    return Result.success()
+            // Получаем первую партию данных для отправки
+            val dataBatch = dao.getUnsentBatch(BATCH_SIZE)
+
+            if (dataBatch.isEmpty()) {
+                Log.d("PotholeUploadWorker", "Нет данных для отправки")
+                return Result.success()
+            }
+
+            Log.d("PotholeUploadWorker", "Отправка ${dataBatch.size} записей...")
+
+            val request = PotholeDataRequest(user_id = userId, data = dataBatch)
+            val response = api.uploadPotholeData(request)
+
+            if (response.isSuccessful) {
+                // Помечаем данные как отправленные
+                dao.markAsSent(dataBatch.map { it.id })
+                Log.d("PotholeUploadWorker", "Успешно отправлено ${dataBatch.size} записей")
+
+                // Если есть еще данные, планируем следующую отправку
+                val hasMoreData = dao.getNewCount() > 0
+                if (hasMoreData) {
+                    // Создаем цепочку воркеров для отправки всех данных
+                    val nextRequest = OneTimeWorkRequestBuilder<PotholeUploadWorker>()
+                        .build()
+
+                    WorkManager.getInstance(applicationContext)
+                        .beginWith(nextRequest)
+                        .enqueue()
                 }
 
-                Log.d("PotholeUploadWorker", "Отправка ${dataBatch.size} записей...")
-
-                val request = PotholeDataRequest(user_id = userId, data = dataBatch)
-                val response = api.uploadPotholeData(request)
-
-                if (response.isSuccessful) {
-                    //dao.deleteByIds(dataBatch.map { it.id })
-                    dao.markAsSent(dataBatch.map { it.id })
-                    Log.d("PotholeUploadWorker", "Удалено ${dataBatch.size} записей, продолжаем...")
-                } else {
-                    Log.w("PotholeUploadWorker", "Ошибка отправки: ${response.code()} ${response.message()}")
-                    return Result.retry()
-                }
+                Result.success()
+            } else {
+                Log.w("PotholeUploadWorker", "Ошибка отправки: ${response.code()} ${response.message()}")
+                Result.retry()
             }
         } catch (e: IOException) {
             Log.e("PotholeUploadWorker", "Сетевая ошибка", e)
-            return Result.retry()
+            Result.retry()
         } catch (e: HttpException) {
             Log.e("PotholeUploadWorker", "HTTP ошибка", e)
-            return Result.retry()
+            Result.retry()
+        } catch (e: Exception) {
+            Log.e("PotholeUploadWorker", "Неизвестная ошибка", e)
+            Result.failure()
         }
     }
 
-
-
+    companion object {
+        private const val BATCH_SIZE = 5000 // Уменьшил размер батча для надежности
+    }
 }
