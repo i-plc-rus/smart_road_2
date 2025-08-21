@@ -175,7 +175,10 @@ class MainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             requiredPermissions += Manifest.permission.ACTIVITY_RECOGNITION
-            requiredPermissions += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requiredPermissions += Manifest.permission.POST_NOTIFICATIONS
         }
 
         val notGranted = requiredPermissions.filter {
@@ -189,10 +192,31 @@ class MainActivity : AppCompatActivity() {
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         } else {
-            // все разрешения уже есть
+            // все foreground-права уже есть
+            checkBackgroundLocationPermission()
+        }
+    }
+
+    private fun checkBackgroundLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                    LOCATION_PERMISSION_REQUEST_CODE + 1
+                )
+            } else {
+                startPotholeService()
+            }
+        } else {
             startPotholeService()
         }
     }
+
 
     // обработка результата запроса
     override fun onRequestPermissionsResult(
@@ -205,12 +229,20 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             val allGranted = grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
             if (allGranted) {
-                startPotholeService()
+                // после foreground — проверяем background
+                checkBackgroundLocationPermission()
             } else {
                 Toast.makeText(this, "Для работы приложения нужны разрешения", Toast.LENGTH_LONG).show()
             }
+        } else if (requestCode == LOCATION_PERMISSION_REQUEST_CODE + 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startPotholeService()
+            } else {
+                Toast.makeText(this, "Фоновая геолокация нужна для работы в фоне", Toast.LENGTH_LONG).show()
+            }
         }
     }
+
 
 
     /** Запуск сервиса */

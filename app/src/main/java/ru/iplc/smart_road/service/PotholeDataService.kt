@@ -253,8 +253,8 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
         )
 
         return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Сбор данных о дорогах")
-            .setContentText("Активный мониторинг дорожного покрытия")
+            .setContentTitle("Поиск ям")
+            .setContentText("Включен")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_LOW)
