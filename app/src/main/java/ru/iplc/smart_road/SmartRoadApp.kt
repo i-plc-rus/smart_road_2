@@ -29,7 +29,7 @@ class SmartRoadApp: Application() {
             .build()
 
         val apiService = Retrofit.Builder()
-            .baseUrl("https://functions.yandexcloud.net/")
+            .baseUrl("https://d5dqbuds89dfpltkrqd7.fary004x.apigw.yandexcloud.net/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

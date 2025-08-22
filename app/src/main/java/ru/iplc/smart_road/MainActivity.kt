@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
         val navView = findViewById<NavigationView>(R.id.nav_view)
         navView.setupWithNavController(navController)
 
+
         // Кастомный обработчик для пунктов меню
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -100,9 +101,18 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    //navigateToLogin()
-                    navController.navigate(R.id.nav_login)
-                    binding.drawerLayout.closeDrawer(navView)
+                    val app = application as SmartRoadApp
+
+                    lifecycleScope.launch {
+                        val isAuth = app.authRepository.isAuthenticated()
+                        if (isAuth) {
+                            navController.navigate(R.id.nav_profile)
+                        } else {
+                            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                        }
+                        binding.drawerLayout.closeDrawer(navView)
+                    }
+
                     true
                 }
                 R.id.nav_garage -> {

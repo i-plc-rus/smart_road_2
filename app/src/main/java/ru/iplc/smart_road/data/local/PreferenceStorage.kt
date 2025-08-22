@@ -111,6 +111,7 @@ object PreferenceStorage {
             username = username,
             fio = userPrefs.getString("fio", "") ?: "",
             phone = userPrefs.getString("phone", "") ?: "",
+            email = userPrefs.getString("email", "") ?: "",
             password = userPrefs.getString("password", "") ?: "",
             avatarUrl = userPrefs.getString("avatarUrl", "") ?: ""
         )

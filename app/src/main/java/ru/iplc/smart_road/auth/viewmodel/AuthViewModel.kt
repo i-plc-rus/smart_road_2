@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.iplc.smart_road.data.model.AuthResponse
 import ru.iplc.smart_road.data.model.User
+import ru.iplc.smart_road.data.model.UserProfile
 import ru.iplc.smart_road.data.repository.AuthRepository
 
 // AuthViewModel.kt
@@ -20,8 +21,8 @@ class AuthViewModel(
     private val _registerResult = MutableLiveData<AuthRepository.Result<AuthResponse>>()
     val registerResult: LiveData<AuthRepository.Result<AuthResponse>> = _registerResult
 
-    private val _profileResult = MutableLiveData<AuthRepository.Result<User>>()
-    val profileResult: LiveData<AuthRepository.Result<User>> = _profileResult
+    private val _profileResult = MutableLiveData<AuthRepository.Result<UserProfile>>()
+    val profileResult: LiveData<AuthRepository.Result<UserProfile>> = _profileResult
 
     fun login(email: String, password: String) {
         viewModelScope.launch {

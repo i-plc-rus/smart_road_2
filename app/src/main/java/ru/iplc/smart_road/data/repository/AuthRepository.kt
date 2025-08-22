@@ -70,6 +70,8 @@ class AuthRepository(private val apiService: ApiService, private val tokenManage
         }
     }
 
+
+
     suspend fun logout() {
         tokenManager.clearTokens()
     }
@@ -79,4 +81,9 @@ class AuthRepository(private val apiService: ApiService, private val tokenManage
         data class Error(val message: String) : Result<Nothing>()
         object Loading : Result<Nothing>()
     }
+
+    suspend fun isAuthenticated(): Boolean {
+        return tokenManager.isLoggedIn()
+    }
+
 }

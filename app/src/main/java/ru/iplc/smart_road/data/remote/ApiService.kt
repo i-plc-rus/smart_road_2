@@ -23,16 +23,16 @@ import ru.iplc.smart_road.data.model.UserProfile
 import java.util.concurrent.TimeUnit
 
 interface ApiService {
-    @POST("d4ecg0afm0a6m8547i10")
+    @POST("login")
     suspend fun login(@Body authRequest: AuthRequest): Response<AuthResponse>
 
-    @POST("d4esv050svbpfgltj7nt")
+    @POST("registration")
     suspend fun register(@Body registerRequest: RegisterRequest): Response<AuthResponse>
 
-    @GET("users/me")//!!
+    @GET("profile")
     suspend fun getProfile(): Response<UserProfile>
 
-    @POST("d4edlqujb8517a04ajif")
+    @POST("indata")
     suspend fun uploadPotholeData(@Body request: PotholeDataRequest): Response<Unit>
 
     @Multipart
@@ -45,7 +45,7 @@ interface ApiService {
     companion object {
         fun create(): ApiService {
             val retrofit = Retrofit.Builder()
-                .baseUrl("https://functions.yandexcloud.net/")
+                .baseUrl("https://d5dqbuds89dfpltkrqd7.fary004x.apigw.yandexcloud.net/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(
                     OkHttpClient.Builder()

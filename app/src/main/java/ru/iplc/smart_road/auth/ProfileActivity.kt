@@ -11,6 +11,7 @@ import ru.iplc.smart_road.SmartRoadApp
 import ru.iplc.smart_road.auth.viewmodel.AuthViewModel
 import ru.iplc.smart_road.auth.viewmodel.AuthViewModelFactory
 import ru.iplc.smart_road.data.model.User
+import ru.iplc.smart_road.data.model.UserProfile
 import ru.iplc.smart_road.data.repository.AuthRepository
 import ru.iplc.smart_road.databinding.ActivityProfileBinding
 
@@ -67,10 +68,10 @@ class ProfileActivity : AppCompatActivity() {
         binding.logoutButton.isEnabled = !isLoading
     }
 
-    private fun displayProfile(user: User) {
-        binding.nameTextView.text = user.name
+    private fun displayProfile(user: UserProfile) {
+        binding.nameTextView.text = user.username
         binding.emailTextView.text = user.email
-        binding.createdAtTextView.text = "Member since ${user.createdAt}"
+        //binding.createdAtTextView.text = "Member since ${user.createdAt}"
     }
 
     private fun handleError(errorMessage: String) {
