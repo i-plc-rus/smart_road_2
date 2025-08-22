@@ -1,5 +1,7 @@
 package ru.iplc.smart_road.data.repository
 
+import android.content.Context
+import android.net.Uri
 import ru.iplc.smart_road.data.local.TokenManager
 import ru.iplc.smart_road.data.model.AuthRequest
 import ru.iplc.smart_road.data.model.AuthResponse
@@ -7,7 +9,12 @@ import ru.iplc.smart_road.data.model.RegisterRequest
 import ru.iplc.smart_road.data.model.User
 import ru.iplc.smart_road.data.remote.ApiService
 import android.util.Log
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import ru.iplc.smart_road.data.model.AvatarResponse
 import ru.iplc.smart_road.data.model.UserProfile
+import java.io.File
 
 
 //import ru.iplc.smart_road.network.xApiService
@@ -85,5 +92,45 @@ class AuthRepository(private val apiService: ApiService, private val tokenManage
     suspend fun isAuthenticated(): Boolean {
         return tokenManager.isLoggedIn()
     }
+
+    suspend fun uploadAvatar(uri: Uri, context: Context): Result<AvatarResponse> {
+        return try {
+            val contentResolver = context.contentResolver
+            val inputStream = contentResolver.openInputStream(uri)
+                ?: return Result.Error("Не удалось открыть файл")
+
+            val file = File(context.cacheDir, "avatar_${System.currentTimeMillis()}.jpg")
+            file.outputStream().use { output -> inputStream.copyTo(output) }
+
+            val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+            val part = MultipartBody.Part.createFormData("file", file.name, requestBody)
+
+            val response = apiService.uploadAvatar(part)
+            if (response.isSuccessful && response.body() != null) {
+                Result.Success(response.body()!!)
+            } else {
+                Result.Error("Ошибка загрузки: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Ошибка загрузки")
+        }
+    }
+
+    suspend fun updateProfile(userProfile: UserProfile): AuthRepository.Result<UserProfile> {
+        return try {
+            val response = apiService.updateProfile(userProfile) // PUT /user
+            if (response.isSuccessful && response.body() != null) {
+                AuthRepository.Result.Success(response.body()!!)
+            } else {
+                AuthRepository.Result.Error("Ошибка обновления профиля: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            AuthRepository.Result.Error(e.message ?: "Ошибка сети")
+        }
+    }
+
+
+
+
 
 }

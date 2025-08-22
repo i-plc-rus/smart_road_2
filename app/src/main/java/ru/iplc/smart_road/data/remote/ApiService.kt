@@ -14,6 +14,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import ru.iplc.smart_road.data.model.AuthRequest
 import ru.iplc.smart_road.data.model.AuthResponse
+import ru.iplc.smart_road.data.model.AvatarResponse
 import ru.iplc.smart_road.data.model.BatchPayload
 import ru.iplc.smart_road.data.model.PotholeData
 import ru.iplc.smart_road.data.model.PotholeDataRequest
@@ -37,7 +38,7 @@ interface ApiService {
 
     @Multipart
     @POST("/user/avatar")
-    suspend fun uploadAvatar(@Part avatar: MultipartBody.Part): Response<UserProfile>
+    suspend fun uploadAvatar(@Part avatar: MultipartBody.Part): Response<AvatarResponse>
 
     @PUT("/user/profile")
     suspend fun updateProfile(@Body user: UserProfile): Response<UserProfile>

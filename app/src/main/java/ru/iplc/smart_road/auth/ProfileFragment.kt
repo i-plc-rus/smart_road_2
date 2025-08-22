@@ -16,6 +16,7 @@ import ru.iplc.smart_road.auth.viewmodel.ProfileViewModel
 import ru.iplc.smart_road.auth.viewmodel.ProfileViewModelFactory
 import ru.iplc.smart_road.data.repository.AuthRepository
 import ru.iplc.smart_road.databinding.FragmentProfileBinding
+import androidx.activity.result.contract.ActivityResultContracts
 
 class ProfileFragment : Fragment() {
 
@@ -26,6 +27,7 @@ class ProfileFragment : Fragment() {
 
     private val PICK_IMAGE_REQUEST = 1001
     private var selectedAvatarUri: Uri? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,14 +49,36 @@ class ProfileFragment : Fragment() {
         viewModel.loadProfile()
     }
 
+
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                selectedAvatarUri = it
+                // локальный аватар
+                Glide.with(this).load(it).circleCrop().into(binding.avatarImageView)
+                // показать спиннер
+                binding.avatarProgress.visibility = View.VISIBLE
+                viewModel.uploadAvatar(it, requireContext())
+            }
+        }
+
+
     private fun setupViews() {
         binding.changeAvatarButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, PICK_IMAGE_REQUEST)
+            pickImageLauncher.launch("image/*")
         }
 
         binding.saveButton.setOnClickListener {
-            Toast.makeText(requireContext(), "TODO: реализовать updateProfile()", Toast.LENGTH_SHORT).show()
+            val currentProfile = (viewModel.profile.value as? AuthRepository.Result.Success)?.data
+            currentProfile?.let {
+                val updatedProfile = it.copy(
+                    username = binding.usernameEditText.text.toString().trim(),
+                    fio = binding.fioEditText.text.toString().trim(),
+                    phone = binding.phoneEditText.text.toString().trim(),
+                    email = binding.emailEditText.text.toString().trim()
+                )
+                viewModel.updateProfile(updatedProfile)
+            }
         }
 
         binding.logoutButton.setOnClickListener {
@@ -63,6 +87,8 @@ class ProfileFragment : Fragment() {
             requireActivity().finish()
         }
     }
+
+
 
     private fun setupObservers() {
         viewModel.profile.observe(viewLifecycleOwner) { result ->
@@ -74,31 +100,40 @@ class ProfileFragment : Fragment() {
                     binding.phoneEditText.setText(user.phone)
                     binding.emailEditText.setText(user.email)
 
-                    Glide.with(this)
-                        .load(user.avatarUrl ?: R.drawable.ic_avatar)
-                        .circleCrop()
-                        .into(binding.avatarImageView)
+                    if (!user.avatarUrl.isNullOrEmpty()) {
+                        Glide.with(this)
+                            .load(user.avatarUrl)
+                            .circleCrop()
+                            .into(binding.avatarImageView)
+                    }
+
+                    binding.avatarProgress.visibility = View.GONE
                 }
                 is AuthRepository.Result.Error -> {
                     Toast.makeText(requireContext(), "Ошибка: ${result.message}", Toast.LENGTH_SHORT).show()
+                    binding.avatarProgress.visibility = View.GONE
                 }
                 is AuthRepository.Result.Loading -> {
-                    // можно показать ProgressBar
+                    // Спиннер уже показан в момент выбора, можно оставить пустым
                 }
             }
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            selectedAvatarUri = data.data
-            Glide.with(this).load(selectedAvatarUri).circleCrop().into(binding.avatarImageView)
 
-            // TODO: отправить на сервер через репозиторий (multipart upload)
-        }
-    }
+//    @Deprecated("Deprecated in Java")
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+//            selectedAvatarUri = data.data
+//            Glide.with(this).load(selectedAvatarUri).circleCrop().into(binding.avatarImageView)
+//
+//            selectedAvatarUri?.let { uri ->
+//                viewModel.uploadAvatar(uri, requireContext())
+//            }
+//        }
+//    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
