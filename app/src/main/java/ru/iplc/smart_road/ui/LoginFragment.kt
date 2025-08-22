@@ -123,7 +123,8 @@ class LoginFragment : Fragment() {
 
     private fun navigateToMain() {
         // Навигация в Main (например, если у тебя graph.xml настроен)
-        findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+        //findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+        findNavController().navigate(R.id.action_loginFragment_to_profileFragment)
     }
 
     private fun handleError(errorMessage: String) {

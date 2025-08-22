@@ -40,9 +40,14 @@
 <!--            android:id="@+id/action_loginFragment_to_registerFragment"-->
 <!--            app:destination="@id/registerFragment" />-->
         <action
-            android:id="@+id/action_loginFragment_to_mainFragment"
-            app:destination="@id/nav_home" />
+            android:id="@+id/action_loginFragment_to_profileFragment"
+            app:destination="@id/nav_profile" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="ru.iplc.smart_road.auth.ProfileFragment"
+        android:label="Профиль"/>
 
 
 

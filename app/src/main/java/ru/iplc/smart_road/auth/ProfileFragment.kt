@@ -1,0 +1,107 @@
+package ru.iplc.smart_road.auth
+
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.MediaStore
+import android.view.*
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import ru.iplc.smart_road.R
+import ru.iplc.smart_road.SmartRoadApp
+import ru.iplc.smart_road.auth.viewmodel.ProfileViewModel
+import ru.iplc.smart_road.auth.viewmodel.ProfileViewModelFactory
+import ru.iplc.smart_road.data.repository.AuthRepository
+import ru.iplc.smart_road.databinding.FragmentProfileBinding
+
+class ProfileFragment : Fragment() {
+
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var viewModel: ProfileViewModel
+
+    private val PICK_IMAGE_REQUEST = 1001
+    private var selectedAvatarUri: Uri? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val app = requireActivity().application as SmartRoadApp
+        viewModel = ViewModelProvider(
+            this,
+            ProfileViewModelFactory(app.authRepository)
+        )[ProfileViewModel::class.java]
+
+        setupViews()
+        setupObservers()
+        viewModel.loadProfile()
+    }
+
+    private fun setupViews() {
+        binding.changeAvatarButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        }
+
+        binding.saveButton.setOnClickListener {
+            Toast.makeText(requireContext(), "TODO: реализовать updateProfile()", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.logoutButton.setOnClickListener {
+            viewModel.logout()
+            // Навигация обратно на экран логина
+            requireActivity().finish()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.profile.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is AuthRepository.Result.Success -> {
+                    val user = result.data
+                    binding.usernameEditText.setText(user.username)
+                    binding.fioEditText.setText(user.fio)
+                    binding.phoneEditText.setText(user.phone)
+                    binding.emailEditText.setText(user.email)
+
+                    Glide.with(this)
+                        .load(user.avatarUrl ?: R.drawable.ic_avatar)
+                        .circleCrop()
+                        .into(binding.avatarImageView)
+                }
+                is AuthRepository.Result.Error -> {
+                    Toast.makeText(requireContext(), "Ошибка: ${result.message}", Toast.LENGTH_SHORT).show()
+                }
+                is AuthRepository.Result.Loading -> {
+                    // можно показать ProgressBar
+                }
+            }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            selectedAvatarUri = data.data
+            Glide.with(this).load(selectedAvatarUri).circleCrop().into(binding.avatarImageView)
+
+            // TODO: отправить на сервер через репозиторий (multipart upload)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

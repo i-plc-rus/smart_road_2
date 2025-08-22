@@ -7,6 +7,7 @@ import ru.iplc.smart_road.data.model.RegisterRequest
 import ru.iplc.smart_road.data.model.User
 import ru.iplc.smart_road.data.remote.ApiService
 import android.util.Log
+import ru.iplc.smart_road.data.model.UserProfile
 
 
 //import ru.iplc.smart_road.network.xApiService
@@ -50,7 +51,7 @@ class AuthRepository(private val apiService: ApiService, private val tokenManage
         }
     }
 
-    suspend fun getProfile(): Result<User> {
+    suspend fun getProfile(): Result<UserProfile> {
         return try {
             val response = apiService.getProfile()
 
