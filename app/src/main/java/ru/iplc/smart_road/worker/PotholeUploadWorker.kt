@@ -101,8 +101,8 @@ class PotholeUploadWorker(
 
     companion object {
         private const val TAG = "PotholeUploadWorker"
-        private const val BATCH_SIZE = 500
-        private const val MAX_PARALLEL_REQUESTS = 3
+        private const val BATCH_SIZE = 2500
+        private const val MAX_PARALLEL_REQUESTS = 5
 
         fun enqueue(context: Context) {
             val request = OneTimeWorkRequestBuilder<PotholeUploadWorker>()
