@@ -2,6 +2,7 @@ package ru.iplc.smart_road.auth
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,6 +18,9 @@ import ru.iplc.smart_road.auth.viewmodel.ProfileViewModelFactory
 import ru.iplc.smart_road.data.repository.AuthRepository
 import ru.iplc.smart_road.databinding.FragmentProfileBinding
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.navigation.fragment.findNavController
+import java.io.File
+import java.io.FileOutputStream
 
 class ProfileFragment : Fragment() {
 
@@ -46,21 +50,43 @@ class ProfileFragment : Fragment() {
 
         setupViews()
         setupObservers()
+        setupToolbar()
         viewModel.loadProfile()
     }
+
+    private fun setupToolbar() {
+        binding.toolbarGarage.apply {
+            title = "Профиль"
+            setNavigationOnClickListener { findNavController().navigateUp() }
+        }
+    }
+
+
+    private fun showLoadingOverlay(show: Boolean) {
+        binding.loadingOverlay.visibility = if (show) View.VISIBLE else View.GONE
+        binding.profileContent.isEnabled = !show
+    }
+
 
 
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 selectedAvatarUri = it
-                // локальный аватар
-                Glide.with(this).load(it).circleCrop().into(binding.avatarImageView)
-                // показать спиннер
-                binding.avatarProgress.visibility = View.VISIBLE
-                viewModel.uploadAvatar(it, requireContext())
+                // Сжимаем при необходимости
+                val finalUri = compressImageIfNeeded(it)
+
+                // Локальный предпросмотр
+                Glide.with(this).load(finalUri).circleCrop().into(binding.avatarImageView)
+
+                // Показываем overlay и блокируем форму
+                showLoadingOverlay(true)
+
+                // Отправляем на сервер
+                viewModel.uploadAvatar(finalUri, requireContext())
             }
         }
+
 
 
     private fun setupViews() {
@@ -108,17 +134,58 @@ class ProfileFragment : Fragment() {
                     }
 
                     binding.avatarProgress.visibility = View.GONE
+                    showLoadingOverlay(false) // ✅ разблокируем форму
                 }
                 is AuthRepository.Result.Error -> {
                     Toast.makeText(requireContext(), "Ошибка: ${result.message}", Toast.LENGTH_SHORT).show()
                     binding.avatarProgress.visibility = View.GONE
+                    showLoadingOverlay(false) // ✅ тоже разблокируем
                 }
                 is AuthRepository.Result.Loading -> {
-                    // Спиннер уже показан в момент выбора, можно оставить пустым
+                    // ✅ теперь всегда блокируем форму
+                    showLoadingOverlay(true)
                 }
             }
         }
     }
+
+    private fun compressImageIfNeeded(uri: Uri): Uri {
+        val inputStream = requireContext().contentResolver.openInputStream(uri)
+        val byteArray = inputStream?.readBytes()
+        inputStream?.close()
+
+        if (byteArray == null) return uri
+
+        // Если меньше 1 МБ, отдаем как есть
+        if (byteArray.size <= 1 * 1024 * 1024) {
+            return uri
+        }
+
+        // Сжимаем в JPEG
+        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+        val file = File(requireContext().cacheDir, "compressed_avatar.jpg")
+        val outputStream = FileOutputStream(file)
+
+        var quality = 90
+        do {
+            outputStream.flush()
+            outputStream.close()
+            file.delete()
+
+            val newFile = File(requireContext().cacheDir, "compressed_avatar.jpg")
+            val newStream = FileOutputStream(newFile)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, newStream)
+            newStream.flush()
+            newStream.close()
+
+            quality -= 10
+        } while (newFile.length() > 1 * 1024 * 1024 && quality > 10)
+
+        return Uri.fromFile(file)
+    }
+
+
+
 
 
 //    @Deprecated("Deprecated in Java")

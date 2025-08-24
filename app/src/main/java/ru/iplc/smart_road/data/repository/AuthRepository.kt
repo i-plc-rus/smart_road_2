@@ -102,32 +102,35 @@ class AuthRepository(private val apiService: ApiService, private val tokenManage
             val file = File(context.cacheDir, "avatar_${System.currentTimeMillis()}.jpg")
             file.outputStream().use { output -> inputStream.copyTo(output) }
 
-            val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+            val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             val part = MultipartBody.Part.createFormData("file", file.name, requestBody)
 
             val response = apiService.uploadAvatar(part)
             if (response.isSuccessful && response.body() != null) {
                 Result.Success(response.body()!!)
             } else {
-                Result.Error("Ошибка загрузки: ${response.code()}")
+                val errorMsg = response.errorBody()?.string() ?: "Ошибка загрузки"
+                Result.Error("Ошибка загрузки: ${response.code()} $errorMsg")
             }
         } catch (e: Exception) {
             Result.Error(e.message ?: "Ошибка загрузки")
         }
     }
 
-    suspend fun updateProfile(userProfile: UserProfile): AuthRepository.Result<UserProfile> {
+    suspend fun updateProfile(userProfile: UserProfile): Result<UserProfile> {
         return try {
             val response = apiService.updateProfile(userProfile) // PUT /user
             if (response.isSuccessful && response.body() != null) {
-                AuthRepository.Result.Success(response.body()!!)
+                Result.Success(response.body()!!)
             } else {
-                AuthRepository.Result.Error("Ошибка обновления профиля: ${response.code()}")
+                val errorMsg = response.errorBody()?.string() ?: "Неизвестная ошибка"
+                Result.Error("Ошибка обновления профиля: ${response.code()} $errorMsg")
             }
         } catch (e: Exception) {
-            AuthRepository.Result.Error(e.message ?: "Ошибка сети")
+            Result.Error(e.message ?: "Ошибка сети")
         }
     }
+
 
 
 

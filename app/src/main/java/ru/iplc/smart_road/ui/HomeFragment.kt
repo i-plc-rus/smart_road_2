@@ -1,5 +1,6 @@
 package ru.iplc.smart_road.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -70,25 +71,68 @@ class HomeFragment : Fragment() {
         setupStatsPanel(view)
         setupTelemetryControls()
         setupTelemetryButton()
-        binding.telemetryToggle.isSelected = true
     }
 
     private fun setupTelemetryButton() {
-        binding.telemetryToggle.setOnClickListener {
-            binding.telemetryToggle.isSelected = !binding.telemetryToggle.isSelected
+        val prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isTelemetryOn = prefs.getBoolean("telemetry_enabled", false)
 
-            if (binding.telemetryToggle.isSelected) {
-                // Включено
-                (requireActivity() as MainActivity).toggleService(true)
-                Toast.makeText(requireContext(), "Сбор данных запущен", Toast.LENGTH_SHORT).show()
+        // Устанавливаем состояние кнопки
+        binding.telemetryToggle.isSelected = isTelemetryOn
+
+        // Запуск сервиса только если включено
+        if (isTelemetryOn) {
+            startTelemetryService(requireContext())
+        }
+
+        binding.telemetryToggle.setOnClickListener {
+            val newState = !binding.telemetryToggle.isSelected
+            binding.telemetryToggle.isSelected = newState
+
+            // Сохраняем состояние
+            prefs.edit().putBoolean("telemetry_enabled", newState).apply()
+
+            if (newState) {
+                startTelemetryService(requireContext())
             } else {
-                // Выключено
-                (requireActivity() as MainActivity).toggleService(false)
-                Toast.makeText(requireContext(), "Сбор данных остановлен", Toast.LENGTH_SHORT).show()
+                stopTelemetryService(requireContext())
             }
         }
-        updateButtonState()
     }
+
+    private fun startTelemetryService(context: Context) {
+        val intent = Intent(context, PotholeDataService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent)
+        } else {
+            context.startService(intent)
+        }
+        Toast.makeText(context, "Сбор данных запущен", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun stopTelemetryService(context: Context) {
+        val intent = Intent(context, PotholeDataService::class.java)
+        context.stopService(intent)
+        Toast.makeText(context, "Сбор данных остановлен", Toast.LENGTH_SHORT).show()
+    }
+
+
+
+    private fun toggleTelemetryService(context: Context, enabled: Boolean) {
+        val intent = Intent(context, PotholeDataService::class.java)
+        if (enabled) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+            Toast.makeText(context, "Сбор данных запущен", Toast.LENGTH_SHORT).show()
+        } else {
+            context.stopService(intent)
+            Toast.makeText(context, "Сбор данных остановлен", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 
     private fun setupTelemetryControls() {
@@ -301,4 +345,7 @@ class HomeFragment : Fragment() {
         super.onStop()
         Log.d(TAG, "Fragment stopped")
     }
+
+
+
 }

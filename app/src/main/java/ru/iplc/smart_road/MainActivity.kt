@@ -257,6 +257,15 @@ class MainActivity : AppCompatActivity() {
 
     /** Запуск сервиса */
     private fun startPotholeService() {
+
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isTelemetryOn = prefs.getBoolean("telemetry_enabled", false)
+
+        if (!isTelemetryOn) {
+            // Если пользователь выключил телеметрию, не запускаем сервис
+            return
+        }
+
         schedulePotholeUpload(this, this)
         val serviceIntent = Intent(this, PotholeDataService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -366,6 +375,8 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, PotholeDataService::class.java)
         stopService(intent)
     }
+
+
 
 }
 

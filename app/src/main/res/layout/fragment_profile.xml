@@ -1,71 +1,109 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/avatarImageView"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_avatar"
-        android:background="@drawable/icon_background" />
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarGarage"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="?attr/colorOnPrimary"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:navigationIconTint="?attr/colorOnPrimary"/>
+
+    <!-- Контент профиля -->
+    <LinearLayout
+        android:id="@+id/profileContent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+
+
+        <ImageView
+            android:id="@+id/avatarImageView"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_avatar"
+            android:background="@drawable/icon_background" />
+
+        <ProgressBar
+            android:id="@+id/avatarProgress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/changeAvatarButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сменить аватар"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp" />
+
+        <EditText
+            android:id="@+id/usernameEditText"
+            android:hint="Логин"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/fioEditText"
+            android:hint="ФИО"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/phoneEditText"
+            android:hint="Телефон"
+            android:inputType="phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:text="Сохранить изменения"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:text="Выйти"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+    <!-- Overlay -->
+    <LinearLayout
+        android:id="@+id/loadingOverlay"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#80000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
     <ProgressBar
-        android:id="@+id/avatarProgress"
-        style="?android:attr/progressBarStyleSmall"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
-
-    <Button
-        android:id="@+id/changeAvatarButton"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Сменить аватар"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp" />
-
-    <EditText
-        android:id="@+id/usernameEditText"
-        android:hint="Логин"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/fioEditText"
-        android:hint="ФИО"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/phoneEditText"
-        android:hint="Телефон"
-        android:inputType="phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/emailEditText"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/saveButton"
-        android:text="Сохранить изменения"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
-
-    <Button
-        android:id="@+id/logoutButton"
-        android:text="Выйти"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
+        android:layout_height="wrap_content"/>
 </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
