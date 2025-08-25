@@ -49,7 +49,9 @@ class RegisterFragment : Fragment() {
         binding.toolbarRegister.apply {
             //title = getString(R.string.register_title)
             title = "Регистрация"
-            setNavigationOnClickListener { findNavController().navigateUp() }
+            setNavigationOnClickListener {
+                findNavController().navigate(R.id.nav_home)
+            }
         }
     }
 

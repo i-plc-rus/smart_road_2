@@ -1,7 +1,10 @@
 package ru.iplc.smart_road.data.remote
 
+import okhttp3.ConnectionPool
+import okhttp3.ConnectionSpec
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -39,16 +42,16 @@ interface ApiService {
     suspend fun uploadPotholeData(@Body request: PotholeDataRequest): Response<Unit>
 
     @Multipart
-    @POST("/user/avatar")
+    @POST("user/avatar")
     suspend fun uploadAvatar(@Part avatar: MultipartBody.Part): Response<AvatarResponse>
 
-    @PUT("/user/profile")
+    @PUT("user/profile")
     suspend fun updateProfile(@Body user: UserProfile): Response<UserProfile>
 
     @POST("indatas3geturl")
     suspend fun getS3UploadUrl(@Body request: S3UploadUrlRequest): Response<S3UploadUrlResponse>
 
-    companion object {
+    /*companion object {
         fun create(): ApiService {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://d5dqbuds89dfpltkrqd7.fary004x.apigw.yandexcloud.net/")
@@ -61,10 +64,13 @@ interface ApiService {
                         .addInterceptor(HttpLoggingInterceptor().apply {
                             level = HttpLoggingInterceptor.Level.BODY
                         })
+                        .connectionSpecs(listOf(ConnectionSpec.COMPATIBLE_TLS, ConnectionSpec.CLEARTEXT))
+                        .protocols(listOf(Protocol.HTTP_1_1))
+                        .connectionPool(ConnectionPool(0, 1, TimeUnit.NANOSECONDS))
                         .build()
                 )
                 .build()
             return retrofit.create(ApiService::class.java)
         }
-    }
+    }*/
 }

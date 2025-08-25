@@ -49,7 +49,9 @@ class LoginFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbarLogin.apply {
             title = "Аутентификация"
-            setNavigationOnClickListener { findNavController().navigateUp() }
+            setNavigationOnClickListener {
+                findNavController().navigate(R.id.nav_home)
+            }
         }
     }
 

@@ -94,7 +94,9 @@ class SettingsFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbarSettings.apply {
             title = "О приложении"
-            setNavigationOnClickListener { findNavController().navigateUp() }
+            setNavigationOnClickListener {
+                findNavController().navigate(R.id.nav_home)
+            }
 
             // Подключаем меню
             inflateMenu(R.menu.menu_settings)

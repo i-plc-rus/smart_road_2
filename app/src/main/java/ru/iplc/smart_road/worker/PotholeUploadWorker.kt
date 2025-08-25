@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.HttpException
+import ru.iplc.smart_road.SmartRoadApp
 import ru.iplc.smart_road.data.local.TokenManager
 import ru.iplc.smart_road.data.model.PotholeData
 import ru.iplc.smart_road.data.model.PotholeDataRequest
@@ -32,7 +33,11 @@ class PotholeUploadWorker(
 ) : CoroutineWorker(appContext, params) {
 
     private val dao = AppDatabase.getInstance(appContext).potholeDao()
-    private val api = ApiService.create()
+    //private val api = ApiService.create()
+    private val api: ApiService by lazy {
+        (applicationContext as SmartRoadApp).apiService
+    }
+
     private val tokenManager = TokenManager(appContext)
 
     override suspend fun doWork(): Result = coroutineScope {
@@ -57,6 +62,7 @@ class PotholeUploadWorker(
                 val zipFile = FileUtils.writeCsvAndZip(applicationContext, filename, batch)
 
                 // 2. получаем S3 upload url
+
                 val response = api.getS3UploadUrl(S3UploadUrlRequest(userId, "$filename.zip"))
                 if (!response.isSuccessful || response.body() == null) {
                     Log.e(TAG, "Ошибка получения S3 ссылки: ${response.code()}")

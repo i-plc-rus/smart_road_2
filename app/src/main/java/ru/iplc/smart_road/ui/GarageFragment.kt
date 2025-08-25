@@ -46,7 +46,9 @@ class GarageFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbarGarage.apply {
             title = "Гараж"
-            setNavigationOnClickListener { findNavController().navigateUp() }
+            setNavigationOnClickListener {
+                findNavController().navigate(R.id.nav_home)
+            }
         }
     }
 

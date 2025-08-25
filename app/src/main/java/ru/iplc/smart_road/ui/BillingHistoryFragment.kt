@@ -53,7 +53,9 @@ class BillingHistoryFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbarBill.apply {
             title = "Биллинг"
-            setNavigationOnClickListener { findNavController().navigateUp() }
+            setNavigationOnClickListener {
+                findNavController().navigate(R.id.nav_home)
+            }
         }
     }
 }

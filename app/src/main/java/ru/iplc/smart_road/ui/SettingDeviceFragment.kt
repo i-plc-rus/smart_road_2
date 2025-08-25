@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import ru.iplc.smart_road.R
 import ru.iplc.smart_road.data.local.PreferenceStorage
 import ru.iplc.smart_road.data.model.InstallationMethod
 import ru.iplc.smart_road.databinding.FragmentSettingDeviceBinding
@@ -59,7 +60,9 @@ class SettingDeviceFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbarSettingDevice.apply {
             title = "Способ установки"
-            setNavigationOnClickListener { findNavController().navigateUp() }
+            setNavigationOnClickListener {
+                findNavController().navigate(R.id.nav_home)
+            }
         }
     }
 

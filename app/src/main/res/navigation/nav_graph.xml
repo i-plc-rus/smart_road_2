@@ -62,8 +62,9 @@
 
     <fragment
         android:id="@+id/nav_profile"
-        android:name="ru.iplc.smart_road.auth.ProfileFragment"
-        android:label="Профиль"/>
+        android:name="ru.iplc.smart_road.ui.ProfileFragment"
+        android:label="Профиль"
+        />
 
 
 
