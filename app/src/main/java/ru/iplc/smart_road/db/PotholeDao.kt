@@ -37,5 +37,8 @@ interface PotholeDao {
     @Query("UPDATE pothole_data SET isSent = 1 WHERE id IN (:ids)")
     suspend fun markAsSent(ids: List<Long>)
 
+    @Query("DELETE FROM pothole_data WHERE isSent = 1")
+    suspend fun deleteSent()
+
 
 }

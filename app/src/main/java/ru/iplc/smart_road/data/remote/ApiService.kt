@@ -19,6 +19,8 @@ import ru.iplc.smart_road.data.model.BatchPayload
 import ru.iplc.smart_road.data.model.PotholeData
 import ru.iplc.smart_road.data.model.PotholeDataRequest
 import ru.iplc.smart_road.data.model.RegisterRequest
+import ru.iplc.smart_road.data.model.S3UploadUrlRequest
+import ru.iplc.smart_road.data.model.S3UploadUrlResponse
 import ru.iplc.smart_road.data.model.User
 import ru.iplc.smart_road.data.model.UserProfile
 import java.util.concurrent.TimeUnit
@@ -42,6 +44,9 @@ interface ApiService {
 
     @PUT("/user/profile")
     suspend fun updateProfile(@Body user: UserProfile): Response<UserProfile>
+
+    @POST("indatas3geturl")
+    suspend fun getS3UploadUrl(@Body request: S3UploadUrlRequest): Response<S3UploadUrlResponse>
 
     companion object {
         fun create(): ApiService {
