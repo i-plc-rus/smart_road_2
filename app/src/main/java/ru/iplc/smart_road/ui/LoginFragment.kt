@@ -66,7 +66,7 @@ class LoginFragment : Fragment() {
 
         binding.registerTextView.setOnClickListener {
             if (binding.loginProgress.visibility != View.VISIBLE) {
-                //findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
             }
         }
     }
