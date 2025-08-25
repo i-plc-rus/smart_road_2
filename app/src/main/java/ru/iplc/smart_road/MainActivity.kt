@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +17,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
@@ -27,8 +25,6 @@ import androidx.work.WorkManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
-import ru.iplc.smart_road.auth.LoginActivity
-import ru.iplc.smart_road.auth.ProfileActivity
 import ru.iplc.smart_road.data.local.TokenManager
 import ru.iplc.smart_road.databinding.ActivityMainBinding
 import ru.iplc.smart_road.service.PotholeDataService
@@ -108,7 +104,8 @@ class MainActivity : AppCompatActivity() {
                         if (isAuth) {
                             navController.navigate(R.id.nav_profile)
                         } else {
-                            startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                            //startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                            navController.navigate(R.id.nav_login)
                         }
                         binding.drawerLayout.closeDrawer(navView)
                     }

@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import ru.iplc.smart_road.data.local.PreferenceStorage
 import ru.iplc.smart_road.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
-import ru.iplc.smart_road.ui.auth.AuthActivity
 
 class xProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding

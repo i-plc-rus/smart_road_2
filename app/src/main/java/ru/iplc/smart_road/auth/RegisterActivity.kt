@@ -168,12 +168,12 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun navigateToLogin() {
-        startActivity(Intent(this, LoginActivity::class.java))
+        //startActivity(Intent(this, x_LoginActivity::class.java))
         finish()
     }
 
     private fun navigateToProfile() {
-        startActivity(Intent(this, ProfileActivity::class.java))
+        //startActivity(Intent(this, x_ProfileActivity::class.java))
         finish()
     }
     private fun navigateToMain() {

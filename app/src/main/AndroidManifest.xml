@@ -46,9 +46,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".auth.LoginActivity" />
-        <activity android:name=".auth.RegisterActivity" />
-        <activity android:name=".auth.ProfileActivity" />
         <service android:name=".service.PotholeDataService"
             android:foregroundServiceType="location"
             android:enabled="true"
