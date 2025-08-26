@@ -90,7 +90,7 @@ class PotholeUploadWorker(
                 totalSent += batch.size
                 Log.d(TAG, "✅ Отправлено и удалено ${batch.size}, всего $totalSent")
             }
-            dao.deleteSent()
+            //dao.deleteSent()
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Фатальная ошибка", e)
