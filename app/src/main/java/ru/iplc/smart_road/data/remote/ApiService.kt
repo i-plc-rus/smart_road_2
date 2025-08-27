@@ -51,26 +51,5 @@ interface ApiService {
     @POST("indatas3geturl")
     suspend fun getS3UploadUrl(@Body request: S3UploadUrlRequest): Response<S3UploadUrlResponse>
 
-    /*companion object {
-        fun create(): ApiService {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://d5dqbuds89dfpltkrqd7.fary004x.apigw.yandexcloud.net/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(
-                    OkHttpClient.Builder()
-                        .connectTimeout(60, TimeUnit.SECONDS)
-                        .readTimeout(60, TimeUnit.SECONDS)
-                        .writeTimeout(60, TimeUnit.SECONDS)
-                        .addInterceptor(HttpLoggingInterceptor().apply {
-                            level = HttpLoggingInterceptor.Level.BODY
-                        })
-                        .connectionSpecs(listOf(ConnectionSpec.COMPATIBLE_TLS, ConnectionSpec.CLEARTEXT))
-                        .protocols(listOf(Protocol.HTTP_1_1))
-                        .connectionPool(ConnectionPool(0, 1, TimeUnit.NANOSECONDS))
-                        .build()
-                )
-                .build()
-            return retrofit.create(ApiService::class.java)
-        }
-    }*/
+
 }
