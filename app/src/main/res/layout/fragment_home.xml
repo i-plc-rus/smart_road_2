@@ -57,9 +57,14 @@
                 android:id="@+id/stats_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:padding="12dp"
                 android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                 <!-- Плитки с цифрами -->
                 <ru.iplc.smart_road.ui.view.StatsItemView
@@ -90,8 +95,19 @@
                     app:statValue="2"
                     app:statLabel="колейность"/>
             </LinearLayout>
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/accel_chart"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_margin="8dp"
+                android:layout_marginBottom="16dp" />
+            </LinearLayout>
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+
 
     <!-- Остальные элементы (правая панель) -->
     <!-- Правая панель: меню + кнопки -->

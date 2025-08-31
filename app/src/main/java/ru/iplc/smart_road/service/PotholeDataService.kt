@@ -24,6 +24,7 @@ import ru.iplc.smart_road.db.AppDatabase
 import java.util.concurrent.CopyOnWriteArrayList
 import android.content.pm.PackageManager
 import java.util.concurrent.ConcurrentLinkedQueue
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 
 private val LOCATION_PERMISSION_REQUEST_CODE: Int
@@ -49,7 +50,8 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     private var lastSaveTime = 0L
     private val SAVE_INTERVAL = 5000L // 5 секунд
 
-
+    private var lastUiBroadcastTs = 0L
+    private val UI_BROADCAST_INTERVAL_MS = 50L // 20 Гц
 
 
 
@@ -98,7 +100,7 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
         accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         accelSensor?.let {
             //sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
-                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
         }
 
         // Гироскоп для дополнительных данных
@@ -153,6 +155,20 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
             val currentLocation = lastKnownLocation
+            // Отправляем данные акселерометра в реальном времени
+            if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+                // при желании — сразу компенсируем гравитацию:
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2] - 9.81f
+
+                val now = System.currentTimeMillis()
+                if (now - lastUiBroadcastTs >= UI_BROADCAST_INTERVAL_MS) {
+                    lastUiBroadcastTs = now
+                    sendAccelDataBroadcast(x, y, z, now) // передаём timestamp
+                }
+            }
+
             if (currentLocation != null) {
                 val data = when (event.sensor.type) {
                     Sensor.TYPE_ACCELEROMETER -> PotholeData(
@@ -188,6 +204,16 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
                 }
             }
         }
+    }
+
+    private fun sendAccelDataBroadcast(x: Float, y: Float, z: Float, ts: Long) {
+        val intent = Intent(ACCEL_DATA_ACTION).apply {
+            putExtra(EXTRA_ACCEL_X, x)
+            putExtra(EXTRA_ACCEL_Y, y)
+            putExtra(EXTRA_ACCEL_Z, z)
+            putExtra(EXTRA_TIMESTAMP, ts)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun flushBatch() {
@@ -265,6 +291,14 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     companion object {
         const val NOTIFICATION_ID = 30903
         var lastKnownLocation: Location? = null
+
+        // Константы для передачи данных акселерометра
+        const val ACCEL_DATA_ACTION = "ru.iplc.smart_road.ACCEL_DATA"
+        const val EXTRA_ACCEL_X = "accel_x"
+        const val EXTRA_ACCEL_Y = "accel_y"
+        const val EXTRA_ACCEL_Z = "accel_z"
+        const val EXTRA_TIMESTAMP = "timestamp"
+
     }
 
 }

@@ -1,7 +1,9 @@
 package ru.iplc.smart_road.ui
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +16,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.card.MaterialCardView
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -31,6 +34,19 @@ import ru.iplc.smart_road.service.PotholeDataService
 import ru.iplc.smart_road.utils.schedulePotholeUpload
 import kotlin.math.abs
 
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import java.util.concurrent.ConcurrentLinkedQueue
+
+
+
+
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -42,6 +58,12 @@ class HomeFragment : Fragment() {
         private const val FOLLOW_ZOOM = 17f
         private const val LOCATION_TIMEOUT = 5000L
         private val INVALID_POINT = Point(0.0, 0.0)
+        private const val CHART_UPDATE_INTERVAL = 50L
+
+        private const val MAX_VISIBLE_POINTS = 200     // можно чуть увеличить окно
+        private const val MAX_POINTS_PER_FRAME = 10    // ограничиваем работу на кадр
+        private const val MAX_QUEUE_SIZE = 500         // верхняя граница очереди
+
     }
 
     private lateinit var mapView: MapView
@@ -49,6 +71,26 @@ class HomeFragment : Fragment() {
     private var followUser = true
     private var waitingForLocation = true
     private var isStatsExpanded = false
+
+
+    private lateinit var accelChart: LineChart
+    private lateinit var xData: LineDataSet
+    private lateinit var yData: LineDataSet
+    private lateinit var zData: LineDataSet
+
+    //private val accelDataQueue = ConcurrentLinkedQueue<Triple<Float, Float, Float>>()
+    private var chartUpdateRunnable: Runnable? = null
+    private var timeCounter = 0f
+
+    private lateinit var accelReceiver: BroadcastReceiver
+
+    private data class AccelPoint(val x: Float, val y: Float, val z: Float, val ts: Long)
+
+    private val accelDataQueue = ConcurrentLinkedQueue<AccelPoint>()
+    private var startTimestamp = 0L
+    private val WINDOW_SIZE_SEC = 15f
+    private var fakeDataAdded = false
+
 
 
     override fun onCreateView(
@@ -71,6 +113,183 @@ class HomeFragment : Fragment() {
         setupStatsPanel(view)
         setupTelemetryControls()
         setupTelemetryButton()
+
+        accelChart = view.findViewById(R.id.accel_chart)
+        setupChart()
+        addFakeInitialData()
+        startChartUpdates()
+        // Подпишемся на данные от сервиса
+        observeAccelData()
+    }
+
+    private fun addFakeInitialData() {
+        if (fakeDataAdded) return
+        fakeDataAdded = true
+
+        // Подготавливаем data
+        val data: LineData = accelChart.data ?: return
+
+        // Установим startTimestamp в (now - WINDOW_SIZE_SEC)
+        val now = System.currentTimeMillis()
+        startTimestamp = now - (WINDOW_SIZE_SEC * 1000L).toLong()
+
+        // Заполним окно точками с шагом 500ms (можно уменьшить/увеличить)
+        val stepMs = 500L
+        var t = startTimestamp
+        while (t <= now) {
+            val timeSec = (t - startTimestamp) / 1000f
+            // добавляем нулевые точки в каждый набор
+            data.addEntry(Entry(timeSec, 0f), 0)
+            data.addEntry(Entry(timeSec, 0f), 1)
+            data.addEntry(Entry(timeSec, 0f), 2)
+            t += stepMs
+        }
+
+        data.notifyDataChanged()
+        accelChart.notifyDataSetChanged()
+        accelChart.setVisibleXRangeMaximum(WINDOW_SIZE_SEC)
+        // перемещаем вид к концу окна (в секундах)
+        accelChart.moveViewToX(WINDOW_SIZE_SEC)
+        accelChart.invalidate()
+    }
+
+    private fun observeAccelData() {
+        accelReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == PotholeDataService.ACCEL_DATA_ACTION) {
+                    val x = intent.getFloatExtra(PotholeDataService.EXTRA_ACCEL_X, 0f)
+                    val y = intent.getFloatExtra(PotholeDataService.EXTRA_ACCEL_Y, 0f)
+                    val z = intent.getFloatExtra(PotholeDataService.EXTRA_ACCEL_Z, 0f)
+                    val ts = intent.getLongExtra(PotholeDataService.EXTRA_TIMESTAMP, System.currentTimeMillis())
+
+                    accelDataQueue.add(AccelPoint(x, y, z, ts))
+                }
+            }
+        }
+        val filter = IntentFilter(PotholeDataService.ACCEL_DATA_ACTION)
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(accelReceiver, filter)
+    }
+
+
+
+    private fun setupChart() {
+        // Настройка осей
+        val xAxis = accelChart.xAxis
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.setDrawGridLines(false)
+        xAxis.granularity = 1f
+        xAxis.setLabelCount(5, true)
+
+        val yAxisLeft = accelChart.axisLeft
+        yAxisLeft.setDrawGridLines(true)
+        yAxisLeft.axisMinimum = -20f
+        yAxisLeft.axisMaximum = 20f
+        yAxisLeft.granularity = 5f
+
+        val yAxisRight = accelChart.axisRight
+        yAxisRight.isEnabled = false
+
+        // Настройка данных
+        xData = LineDataSet(mutableListOf(), "X").apply {
+            color = resources.getColor(R.color.green, null)
+            lineWidth = 2f
+            setDrawCircles(false)
+            setDrawValues(false)
+            mode = LineDataSet.Mode.LINEAR
+        }
+
+        yData = LineDataSet(mutableListOf(), "Y").apply {
+            color = resources.getColor(R.color.blue, null)
+            lineWidth = 2f
+            setDrawCircles(false)
+            setDrawValues(false)
+            mode = LineDataSet.Mode.LINEAR
+        }
+
+
+        zData = LineDataSet(mutableListOf(), "Z").apply {
+            color = resources.getColor(R.color.red, null)
+            lineWidth = 2f
+            setDrawCircles(false)
+            setDrawValues(false)
+            mode = LineDataSet.Mode.LINEAR
+        }
+
+        val dataSets = mutableListOf<ILineDataSet>(xData, yData, zData)
+        accelChart.data = LineData(dataSets)
+
+        // Настройка внешнего вида
+        accelChart.description.isEnabled = false
+        accelChart.legend.form = Legend.LegendForm.LINE
+        accelChart.setTouchEnabled(false)
+        accelChart.setPinchZoom(false)
+        accelChart.setScaleEnabled(false)
+        accelChart.setDrawGridBackground(false)
+    }
+
+    private fun startChartUpdates() {
+        chartUpdateRunnable = object : Runnable {
+            override fun run() {
+                processAccelDataQueue()
+                view?.postDelayed(this, CHART_UPDATE_INTERVAL)
+            }
+        }
+        chartUpdateRunnable?.let { view?.post(it) }
+    }
+
+    private fun processAccelDataQueue() {
+        val data = accelChart.data ?: return
+
+        var updated = false
+        var latestTimeSec = 0f
+
+        while (true) {
+            val point = accelDataQueue.poll() ?: break
+            if (startTimestamp == 0L) startTimestamp = point.ts
+
+            val timeSec = (point.ts - startTimestamp) / 1000f
+            latestTimeSec = timeSec
+
+            data.addEntry(Entry(timeSec, point.x), 0)
+            data.addEntry(Entry(timeSec, point.y), 1)
+            data.addEntry(Entry(timeSec, point.z), 2)
+
+            updated = true
+        }
+
+        if (updated) {
+            // Удаляем точки старше 15 секунд
+            for (i in 0 until data.dataSetCount) {
+                val set = data.getDataSetByIndex(i)
+                while (set.entryCount > 0 &&
+                    latestTimeSec - set.getEntryForIndex(0).x > WINDOW_SIZE_SEC) {
+                    set.removeFirst()
+                }
+            }
+
+            data.notifyDataChanged()
+            accelChart.notifyDataSetChanged()
+            accelChart.setVisibleXRangeMaximum(WINDOW_SIZE_SEC)
+            accelChart.moveViewToX(latestTimeSec)
+            accelChart.invalidate()
+        }
+    }
+
+
+
+
+    private fun addAccelEntry(x: Float, y: Float, z: Float) {
+        val data = accelChart.data ?: return
+        timeCounter += 0.5f // каждые 0.5 сек (как observeAccelData)
+
+        data.addEntry(Entry(timeCounter, x), 0)
+        data.addEntry(Entry(timeCounter, y), 1)
+        data.addEntry(Entry(timeCounter, z), 2)
+
+        data.notifyDataChanged()
+        accelChart.notifyDataSetChanged()
+        accelChart.setVisibleXRangeMaximum(20f) // показываем последние 20 точек
+        accelChart.moveViewToX(timeCounter)
     }
 
     private fun setupTelemetryButton() {
@@ -346,6 +565,10 @@ class HomeFragment : Fragment() {
         Log.d(TAG, "Fragment stopped")
     }
 
-
+    override fun onDestroyView() {
+        chartUpdateRunnable?.let { view?.removeCallbacks(it) }
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(accelReceiver)
+        super.onDestroyView()
+    }
 
 }

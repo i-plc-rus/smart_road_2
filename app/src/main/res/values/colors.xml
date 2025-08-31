@@ -19,6 +19,13 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="red">#d70b4f</color>
+    <color name="green">#029847</color>
+    <color name="blue">#009cec</color>
+
+
+
+
 
 
     <!-- Кастомные цвета для светлой темы -->
