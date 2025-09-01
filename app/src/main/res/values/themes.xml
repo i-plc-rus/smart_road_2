@@ -1,63 +1,52 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Smart_road" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary colors -->
+        <!-- Primary colors (чёрно-белые) -->
+        <item name="colorPrimary">@color/gray_800</item>
+        <item name="colorPrimaryVariant">@color/gray_600</item>
+        <item name="colorOnPrimary">@color/white</item>
 
-        <item name="colorPrimaryVariant">#444444</item>
-        <item name="android:textColorPrimary">@color/gray_700</item> <!-- Тёмный текст -->
-
-
-        <!-- Secondary colors -->
-        <item name="colorSecondary">#444444</item>
-        <item name="colorSecondaryVariant">#2C2C2C</item>
+        <!-- Secondary colors (чёрно-белые) -->
+        <item name="colorSecondary">@color/gray_700</item>
+        <item name="colorSecondaryVariant">@color/gray_500</item>
         <item name="colorOnSecondary">@color/white</item>
 
         <!-- Background and surface colors -->
         <item name="android:windowBackground">@color/background_light</item>
-
-
-        <!-- Card colors -->
-        <item name="colorCardBackground">@color/card_background_light</item>
-        <item name="colorCardText">@color/card_text_light</item>
-
-        <!-- Status bar -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="emptyStateIconTint">@color/empty_state_icon_tint_light</item>
-
-        <item name="cardBackgroundColor">@color/card_background_color</item>
-        <item name="cardTextColor">@color/card_text_color</item>
-
-
-        <!-- Primary colors -->
-        <item name="colorPrimary">@color/gray_800</item>
-        <item name="colorPrimaryContainer">@color/purple_200</item>
-        <item name="colorOnPrimary">@color/white</item>
-
-        <!-- Surface colors -->
-        <item name="colorSurface">@color/white</item>
-        <item name="colorSurfaceVariant">@color/gray_100</item>
-        <item name="colorOnSurface">@color/black</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorSurfaceVariant">@color/gray_200</item>
+        <item name="colorOnSurface">@color/on_surface_light</item>
 
         <!-- Outline -->
-        <item name="colorOutline">@color/gray_100</item>
+        <item name="colorOutline">@color/outline_light</item>
 
+        <!-- Status bar -->
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
 
-        <item name="colorCardSelected">@color/card_selected_color</item>
-        <item name="colorOnCardText">?attr/colorOnSurface</item>
-        <item name="colorCardStroke">?attr/colorOutline</item>
+        <!-- Кастомные атрибуты карточек -->
+        <item name="colorCardBackground">@color/card_background_light</item>
+        <item name="colorCardText">@color/card_text_light</item>
+        <item name="emptyStateIconTint">@color/empty_state_icon_tint_light</item>
+        <item name="colorCardSelected">@color/gray_300</item>
+        <item name="colorOnCardText">@color/on_surface_light</item>
+        <item name="colorCardStroke">@color/outline_light</item>
 
-        <item name="actionOverflowButtonStyle">@style/MyOverflowStyle</item>
+        <!-- Совместимость со старыми атрибутами -->
+        <item name="cardBackgroundColor">?attr/colorCardBackground</item>
+        <item name="cardTextColor">?attr/colorCardText</item>
 
+        <!-- Action bar -->
+        <item name="actionOverflowButtonStyle">@style/MyOverflowStyleLight</item>
     </style>
+
     <style name="CustomAlertDialogTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
-        <item name="android:textColorPrimary">#000000</item> <!-- Тёмный текст -->
-        <item name="android:textColor">#000000</item>
-        <item name="android:background">#FFFFFF</item> <!-- Белый фон -->
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:background">@color/white</item>
     </style>
 
-    <style name="MyOverflowStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:tint">?attr/colorOnPrimary</item>
+    <style name="MyOverflowStyleLight" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@color/black</item>
     </style>
-
-
 </resources>

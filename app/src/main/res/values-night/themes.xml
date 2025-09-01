@@ -1,47 +1,46 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Smart_road" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary colors -->
+        <!-- Primary colors (чёрно-белые) -->
+        <item name="colorPrimary">@color/gray_200</item>
+        <item name="colorPrimaryVariant">@color/gray_400</item>
+        <item name="colorOnPrimary">@color/black</item>
 
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-
-
-        <!-- Secondary colors -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <!-- Secondary colors (чёрно-белые) -->
+        <item name="colorSecondary">@color/gray_300</item>
+        <item name="colorSecondaryVariant">@color/gray_500</item>
         <item name="colorOnSecondary">@color/black</item>
 
         <!-- Background and surface colors -->
         <item name="android:windowBackground">@color/background_dark</item>
-
-
-        <!-- Card colors -->
-        <item name="colorCardBackground">@color/card_background_dark</item>
-        <item name="colorCardText">@color/card_text_dark</item>
-
-        <!-- Status bar -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="emptyStateIconTint">@color/empty_state_icon_tint_dark</item>
-
-        <item name="cardBackgroundColor">@color/card_background_color</item>
-        <item name="cardTextColor">@color/card_text_color</item>
-
-        <!-- Primary colors -->
-        <item name="colorPrimary">@color/gray_100</item>
-        <item name="colorPrimaryContainer">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-
-        <!-- Surface colors -->
-        <item name="colorSurface">@color/gray_900</item>
+        <item name="colorSurface">@color/surface_dark</item>
         <item name="colorSurfaceVariant">@color/gray_800</item>
-        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnSurface">@color/on_surface_dark</item>
 
         <!-- Outline -->
-        <item name="colorOutline">@color/gray_700</item>
+        <item name="colorOutline">@color/outline_dark</item>
 
+        <!-- Status bar -->
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
 
-        <item name="colorCardSelected">@color/card_selected_color</item>
-        <item name="colorOnCardText">?attr/colorOnSurface</item>
-        <item name="colorCardStroke">?attr/colorOutline</item>
+        <!-- Кастомные атрибуты карточек -->
+        <item name="colorCardBackground">@color/card_background_dark</item>
+        <item name="colorCardText">@color/card_text_dark</item>
+        <item name="emptyStateIconTint">@color/empty_state_icon_tint_dark</item>
+        <item name="colorCardSelected">@color/gray_700</item>
+        <item name="colorOnCardText">@color/on_surface_dark</item>
+        <item name="colorCardStroke">@color/outline_dark</item>
+
+        <!-- Совместимость со старыми атрибутами -->
+        <item name="cardBackgroundColor">?attr/colorCardBackground</item>
+        <item name="cardTextColor">?attr/colorCardText</item>
+
+        <!-- Action bar -->
+        <item name="actionOverflowButtonStyle">@style/MyOverflowStyleDark</item>
+    </style>
+
+    <style name="MyOverflowStyleDark" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@color/white</item>
     </style>
 </resources>

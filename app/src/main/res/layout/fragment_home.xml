@@ -32,7 +32,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="12dp"
-                android:background="#f7f7f7">
+                android:background="?attr/colorSurfaceVariant">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                     android:textSize="16sp"
                     android:layout_weight="1"
                     android:text="Статистика обнаружений"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnSurface"
                     android:gravity="center_vertical"
                     />
 

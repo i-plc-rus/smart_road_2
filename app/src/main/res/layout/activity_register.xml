@@ -44,7 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Фамилия Имя Отчество"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:inputType="textPersonName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Логин"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:inputType="textPersonName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -76,7 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Телефон"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:inputType="textPersonName"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:inputType="textEmailAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Пароль"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -124,7 +124,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Повтор пароля"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSurface"
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 

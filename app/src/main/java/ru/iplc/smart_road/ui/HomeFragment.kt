@@ -173,23 +173,23 @@ class HomeFragment : Fragment() {
 
 
     private fun setupChart() {
-        // Настройка осей
+        // Ось X
         val xAxis = accelChart.xAxis
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.setDrawGridLines(false)
-        xAxis.granularity = 1f
-        xAxis.setLabelCount(5, true)
+        xAxis.isEnabled = false   // убираем подписи снизу
 
+        // Левая ось Y
         val yAxisLeft = accelChart.axisLeft
+        yAxisLeft.isEnabled = true   // оставляем подписи
         yAxisLeft.setDrawGridLines(true)
         yAxisLeft.axisMinimum = -20f
         yAxisLeft.axisMaximum = 20f
         yAxisLeft.granularity = 5f
 
+        // Правая ось Y
         val yAxisRight = accelChart.axisRight
-        yAxisRight.isEnabled = false
+        yAxisRight.isEnabled = false  // скрываем
 
-        // Настройка данных
+        // Данные
         xData = LineDataSet(mutableListOf(), "X").apply {
             color = resources.getColor(R.color.green, null)
             lineWidth = 2f
@@ -206,7 +206,6 @@ class HomeFragment : Fragment() {
             mode = LineDataSet.Mode.LINEAR
         }
 
-
         zData = LineDataSet(mutableListOf(), "Z").apply {
             color = resources.getColor(R.color.red, null)
             lineWidth = 2f
@@ -218,14 +217,16 @@ class HomeFragment : Fragment() {
         val dataSets = mutableListOf<ILineDataSet>(xData, yData, zData)
         accelChart.data = LineData(dataSets)
 
-        // Настройка внешнего вида
+        // Оформление
         accelChart.description.isEnabled = false
-        accelChart.legend.form = Legend.LegendForm.LINE
+        accelChart.legend.isEnabled = false  // убираем легенду
         accelChart.setTouchEnabled(false)
         accelChart.setPinchZoom(false)
         accelChart.setScaleEnabled(false)
         accelChart.setDrawGridBackground(false)
     }
+
+
 
     private fun startChartUpdates() {
         chartUpdateRunnable = object : Runnable {
