@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Smart_road" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+<!--    <style name="Theme.Smart_road" parent="Theme.MaterialComponents.DayNight.DarkActionBar">-->
+    <style name="Theme.Smart_road" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary colors (чёрно-белые) -->
         <item name="colorPrimary">@color/gray_200</item>
         <item name="colorPrimaryVariant">@color/gray_400</item>

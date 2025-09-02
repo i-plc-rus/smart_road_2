@@ -474,6 +474,7 @@ class HomeFragment : Fragment() {
             Animation(Animation.Type.SMOOTH, 0f),
             null
         )
+        applyMapTheme() // ✅ применяем тему к карте
         Log.d(TAG, "Initial map position set to Moscow")
     }
 
@@ -573,7 +574,7 @@ class HomeFragment : Fragment() {
             (activity as? MainActivity)?.openDrawer()
         }
 
-        view.findViewById<Button>(R.id.go_location).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.go_location).setOnClickListener {
             val target = userLocationLayer.cameraPosition()?.target
             if (target != null && target.isValid()) {
                 moveToPosition(target, FOLLOW_ZOOM, "Manual center")
@@ -602,6 +603,12 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         updateChartColors()
+        applyMapTheme() // ✅ обновляем тему карты при возврате
+    }
+
+    private fun applyMapTheme() {
+        val isDarkTheme = isDarkTheme()
+        mapView.map.isNightModeEnabled = isDarkTheme
     }
 
     private fun updateChartColors() {

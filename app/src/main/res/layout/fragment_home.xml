@@ -97,12 +97,29 @@
                     app:statLabel="колейность"/>
             </LinearLayout>
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/accel_chart"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_margin="8dp"
-                android:layout_marginBottom="16dp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_margin="8dp"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Сам график -->
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/accel_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                    <!-- Легенда поверх графика в нижнем правом углу -->
+                    <ImageView
+                        android:id="@+id/accel_legend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="8dp"
+                        android:src="@drawable/accel_legend"
+                        android:contentDescription="Легенда ускорений"/>
+                </FrameLayout>
+
             </LinearLayout>
 
         </LinearLayout>
@@ -162,14 +179,15 @@
             android:background="@drawable/icon_background"
             android:layout_marginBottom="12dp">
 
-            <Button
+            <ImageButton
                 android:id="@+id/go_location"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:background="@drawable/outline_adjust_24"
-                android:textColor="@android:color/white"
-                />
+                android:background="@android:color/transparent"
+                android:src="@drawable/outline_adjust_24"
+                android:contentDescription="Перейти к локации"
+                android:scaleType="centerInside"/>
         </FrameLayout>
 
 
