@@ -32,13 +32,33 @@ class SmartRoadApp: Application() {
         tokenManager = TokenManager(this)
 
         val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(4, TimeUnit.SECONDS)
+            .readTimeout(4, TimeUnit.SECONDS)
+            .writeTimeout(4, TimeUnit.SECONDS)
             .addInterceptor(AuthInterceptor(tokenManager))
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
+            .addInterceptor { chain ->
+                var attempt = 0
+                val maxAttempts = 5
+                var response: okhttp3.Response? = null
+                var lastException: Exception? = null
+
+                while (attempt < maxAttempts) {
+                    try {
+                        response = chain.proceed(chain.request())
+                        if (response.isSuccessful) {
+                            return@addInterceptor response
+                        }
+                    } catch (e: Exception) {
+                        lastException = e
+                    }
+                    attempt++
+                }
+
+                throw lastException ?: RuntimeException("Unknown network error")
+            }
             .build()
 
         apiService = Retrofit.Builder()
