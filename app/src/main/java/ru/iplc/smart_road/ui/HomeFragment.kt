@@ -224,7 +224,7 @@ class HomeFragment : Fragment() {
         }
 
         yData = LineDataSet(mutableListOf(), "Y").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.blue)
+            color = ContextCompat.getColor(requireContext(), R.color.yellow)
             lineWidth = 2f
             setDrawCircles(false)
             setDrawValues(false)

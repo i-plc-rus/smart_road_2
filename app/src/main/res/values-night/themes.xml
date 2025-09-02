@@ -13,12 +13,15 @@
 
         <!-- Background and surface colors -->
         <item name="android:windowBackground">@color/background_dark</item>
-        <item name="colorSurface">@color/surface_dark</item>
-        <item name="colorSurfaceVariant">@color/gray_800</item>
+<!--        <item name="colorSurface">@color/surface_dark</item>-->
+        <item name="colorSurface">@color/background_dark</item>
+<!--        <item name="colorSurfaceVariant">@color/gray_800</item>-->
+        <item name="colorSurfaceVariant">@color/background_dark</item>
         <item name="colorOnSurface">@color/on_surface_dark</item>
 
         <!-- Outline -->
         <item name="colorOutline">@color/outline_dark</item>
+
 
         <!-- Status bar -->
         <item name="android:statusBarColor">?attr/colorSurface</item>

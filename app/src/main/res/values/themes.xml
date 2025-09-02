@@ -49,4 +49,9 @@
     <style name="MyOverflowStyleLight" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/black</item>
     </style>
+
+    <style name="StatsItemStyle">
+        <item name="android:background">@drawable/stat_item_background</item>
+        <item name="android:padding">6dp</item>
+    </style>
 </resources>
