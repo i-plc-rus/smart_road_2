@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -173,6 +174,27 @@ class HomeFragment : Fragment() {
 
 
     private fun setupChart() {
+        val isDarkTheme = isDarkTheme()
+
+        // Цвета в зависимости от темы
+        val textColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), R.color.white)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.black)
+        }
+
+        val gridColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), R.color.gray_600)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.gray_300)
+        }
+
+        val backgroundColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), R.color.surface_dark)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.surface_light)
+        }
+
         // Ось X
         val xAxis = accelChart.xAxis
         xAxis.isEnabled = false   // убираем подписи снизу
@@ -184,6 +206,9 @@ class HomeFragment : Fragment() {
         yAxisLeft.axisMinimum = -20f
         yAxisLeft.axisMaximum = 20f
         yAxisLeft.granularity = 5f
+        yAxisLeft.textColor = textColor
+        yAxisLeft.gridColor = gridColor
+        yAxisLeft.axisLineColor = gridColor
 
         // Правая ось Y
         val yAxisRight = accelChart.axisRight
@@ -191,7 +216,7 @@ class HomeFragment : Fragment() {
 
         // Данные
         xData = LineDataSet(mutableListOf(), "X").apply {
-            color = resources.getColor(R.color.green, null)
+            color = ContextCompat.getColor(requireContext(), R.color.green)
             lineWidth = 2f
             setDrawCircles(false)
             setDrawValues(false)
@@ -199,7 +224,7 @@ class HomeFragment : Fragment() {
         }
 
         yData = LineDataSet(mutableListOf(), "Y").apply {
-            color = resources.getColor(R.color.blue, null)
+            color = ContextCompat.getColor(requireContext(), R.color.blue)
             lineWidth = 2f
             setDrawCircles(false)
             setDrawValues(false)
@@ -207,7 +232,7 @@ class HomeFragment : Fragment() {
         }
 
         zData = LineDataSet(mutableListOf(), "Z").apply {
-            color = resources.getColor(R.color.red, null)
+            color = ContextCompat.getColor(requireContext(), R.color.red)
             lineWidth = 2f
             setDrawCircles(false)
             setDrawValues(false)
@@ -224,6 +249,14 @@ class HomeFragment : Fragment() {
         accelChart.setPinchZoom(false)
         accelChart.setScaleEnabled(false)
         accelChart.setDrawGridBackground(false)
+        accelChart.setBackgroundColor(backgroundColor)
+    }
+
+    // Функция для проверки темной темы
+    private fun isDarkTheme(): Boolean {
+        val flags = requireContext().resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        return flags == android.content.res.Configuration.UI_MODE_NIGHT_YES
     }
 
 
@@ -564,6 +597,42 @@ class HomeFragment : Fragment() {
         MapKitFactory.getInstance().onStop()
         super.onStop()
         Log.d(TAG, "Fragment stopped")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateChartColors()
+    }
+
+    private fun updateChartColors() {
+        val isDarkTheme = isDarkTheme()
+
+        val textColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), R.color.white)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.black)
+        }
+
+        val gridColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), R.color.gray_600)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.gray_300)
+        }
+
+        val backgroundColor = if (isDarkTheme) {
+            ContextCompat.getColor(requireContext(), R.color.surface_dark)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.surface_light)
+        }
+
+        // Обновляем цвета осей
+        accelChart.axisLeft.textColor = textColor
+        accelChart.axisLeft.gridColor = gridColor
+        accelChart.axisLeft.axisLineColor = gridColor
+
+        // Обновляем фон
+        accelChart.setBackgroundColor(backgroundColor)
+        accelChart.invalidate() // Перерисовываем график
     }
 
     override fun onDestroyView() {
