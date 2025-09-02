@@ -7,10 +7,10 @@
         android:id="@+id/nav_garage"
         android:title="Гараж"
         android:icon="@drawable/avtomobil_vgbxfoazcqot" />
-    <item
-        android:id="@+id/nav_bill"
-        android:title="Биллинг"
-        android:icon="@drawable/ic_biling" />
+<!--    <item-->
+<!--        android:id="@+id/nav_bill"-->
+<!--        android:title="Биллинг"-->
+<!--        android:icon="@drawable/ic_biling" />-->
     <item
         android:id="@+id/nav_contact"
         android:title="Контакты"
