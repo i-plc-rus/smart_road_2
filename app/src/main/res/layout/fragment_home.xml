@@ -72,29 +72,31 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:statValue="30"
+                    app:statValue="10"
                     app:statLabel="паттернов"/>
 
                 <ru.iplc.smart_road.ui.view.StatsItemView
+                    android:id="@+id/stats_potholes"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:statValue="13"
+                    app:statValue="0"
                     app:statLabel="ямы"/>
 
                 <ru.iplc.smart_road.ui.view.StatsItemView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:statValue="5"
+                    app:statValue="0"
                     app:statLabel="агрессия"/>
 
                 <ru.iplc.smart_road.ui.view.StatsItemView
+                    android:id="@+id/stats_speed_bumps"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     app:statValue="2"
-                    app:statLabel="колейность"/>
+                    app:statLabel="исскуств.неровность"/>
             </LinearLayout>
 
                 <FrameLayout

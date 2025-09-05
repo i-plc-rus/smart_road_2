@@ -45,7 +45,13 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import java.util.concurrent.ConcurrentLinkedQueue
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import ru.iplc.smart_road.SmartRoadApp
 
+import ru.iplc.smart_road.data.remote.ApiService
+
+import ru.iplc.smart_road.ui.view.StatsItemView
 
 
 class HomeFragment : Fragment() {
@@ -92,6 +98,9 @@ class HomeFragment : Fragment() {
     private val WINDOW_SIZE_SEC = 15f
     private var fakeDataAdded = false
 
+    private val apiService: ApiService by lazy {
+        (requireContext().applicationContext as SmartRoadApp).apiService
+    }
 
 
     override fun onCreateView(
@@ -121,6 +130,9 @@ class HomeFragment : Fragment() {
         startChartUpdates()
         // Подпишемся на данные от сервиса
         observeAccelData()
+
+        loadPatternStats(view)
+
     }
 
     private fun addFakeInitialData() {
@@ -641,6 +653,35 @@ class HomeFragment : Fragment() {
         accelChart.setBackgroundColor(backgroundColor)
         accelChart.invalidate() // Перерисовываем график
     }
+
+    private fun loadPatternStats(view: View) {
+        val potholesView = view.findViewById<StatsItemView>(R.id.stats_potholes)
+        val bumpsView = view.findViewById<StatsItemView>(R.id.stats_speed_bumps)
+
+        // ⚡ используем lifecycleScope для корутин
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = apiService.getPatternStat() // ApiClient твой Retrofit
+                if (response.isSuccessful) {
+                    val stats = response.body().orEmpty()
+
+                    val potholes = stats.find { it.type == "joint" }?.c ?: 0
+                    val speedBumps = stats.find { it.type == "speed_bump" }?.c ?: 0
+
+                    potholesView?.setStatValue(potholes.toString())
+                    bumpsView?.setStatValue(speedBumps.toString())
+
+                    Log.d(TAG, "Stats loaded: potholes=$potholes, speedBumps=$speedBumps")
+                } else {
+                    Log.w(TAG, "getPatternStat failed: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading stats", e)
+            }
+        }
+    }
+
+
 
     override fun onDestroyView() {
         chartUpdateRunnable?.let { view?.removeCallbacks(it) }

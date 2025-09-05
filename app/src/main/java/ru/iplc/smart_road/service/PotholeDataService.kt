@@ -21,14 +21,10 @@ import kotlinx.coroutines.launch
 import ru.iplc.smart_road.R
 import ru.iplc.smart_road.data.model.PotholeData
 import ru.iplc.smart_road.db.AppDatabase
-import java.util.concurrent.CopyOnWriteArrayList
 import android.content.pm.PackageManager
 import java.util.concurrent.ConcurrentLinkedQueue
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-
-private val LOCATION_PERMISSION_REQUEST_CODE: Int
-    get() = 1001
 
 class PotholeDataService : Service(), SensorEventListener, LocationListener {
 
@@ -40,13 +36,11 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Default + serviceJob)
 
-    //private val batchData = CopyOnWriteArrayList<PotholeData>()
     private val batchData = ConcurrentLinkedQueue<PotholeData>()
 
 
     private var wakeLock: PowerManager.WakeLock? = null
 
-    // Оптимизация для фоновой работы
     private var lastSaveTime = 0L
     private val SAVE_INTERVAL = 5000L // 5 секунд
 
@@ -81,7 +75,6 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Можно добавить логирование изменения точности
         Log.d("PotholeDataService", "Accuracy changed for sensor: ${sensor?.name} to: $accuracy")
     }
 
@@ -96,18 +89,12 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     private fun setupSensors() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
-        // Акселерометр с максимальной частотой
         accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         accelSensor?.let {
             //sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
         }
 
-        // Гироскоп для дополнительных данных
-        /*gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-        gyroSensor?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
-        }*/
     }
 
     private fun setupLocation() {
@@ -117,7 +104,6 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                // Используем более частые обновления местоположения
                 locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
                     10000L, // 5 секунд
@@ -125,7 +111,6 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
                     this
                 )
 
-                // Также используем сетевой провайдер для лучшего покрытия
                 locationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER,
                     10000L, // 2 секунды
@@ -157,7 +142,7 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
             val currentLocation = lastKnownLocation
             // Отправляем данные акселерометра в реальном времени
             if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                // при желании — сразу компенсируем гравитацию:
+                // сразу компенсируем гравитацию:
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2] - 9.81f
@@ -165,7 +150,7 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
                 val now = System.currentTimeMillis()
                 if (now - lastUiBroadcastTs >= UI_BROADCAST_INTERVAL_MS) {
                     lastUiBroadcastTs = now
-                    sendAccelDataBroadcast(x, y, z, now) // передаём timestamp
+                    sendAccelDataBroadcast(x, y, z, now)
                 }
             }
 
@@ -180,15 +165,7 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
                         accelZ = event.values[2],
                         //sensorType = "ACCELEROMETER"
                     )
-                    /*Sensor.TYPE_GYROSCOPE -> PotholeData(
-                        timestamp = System.currentTimeMillis(),
-                        latitude = currentLocation.latitude,
-                        longitude = currentLocation.longitude,
-                        gyroX = event.values[0],
-                        gyroY = event.values[1],
-                        gyroZ = event.values[2],
-                        sensorType = "GYROSCOPE"
-                    )*/
+
                     else -> null
                 }
 
@@ -242,7 +219,6 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
 
     override fun onDestroy() {
         Log.d("PotholeDataService", "Service destroyed")
-
         // Сохраняем оставшиеся данные
         flushBatch()
 

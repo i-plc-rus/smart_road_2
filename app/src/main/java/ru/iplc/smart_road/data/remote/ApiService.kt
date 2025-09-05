@@ -19,6 +19,7 @@ import ru.iplc.smart_road.data.model.AuthRequest
 import ru.iplc.smart_road.data.model.AuthResponse
 import ru.iplc.smart_road.data.model.AvatarResponse
 import ru.iplc.smart_road.data.model.BatchPayload
+import ru.iplc.smart_road.data.model.PatternStat
 import ru.iplc.smart_road.data.model.PotholeData
 import ru.iplc.smart_road.data.model.PotholeDataRequest
 import ru.iplc.smart_road.data.model.RegisterRequest
@@ -51,5 +52,7 @@ interface ApiService {
     @POST("indatas3geturl")
     suspend fun getS3UploadUrl(@Body request: S3UploadUrlRequest): Response<S3UploadUrlResponse>
 
+    @GET("pattern_stat")
+    suspend fun getPatternStat(): Response<List<PatternStat>>
 
 }
