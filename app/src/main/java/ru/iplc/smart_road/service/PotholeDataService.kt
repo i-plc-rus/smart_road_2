@@ -48,6 +48,17 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     private val UI_BROADCAST_INTERVAL_MS = 50L // 20 Гц
 
 
+    private var gyroSensor: Sensor? = null
+    private var magSensor: Sensor? = null
+    private var lightSensor: Sensor? = null
+
+    // Текущие значения сенсоров
+    private var lastAccel = FloatArray(3) { 0f }
+    private var lastGyro = FloatArray(3) { 0f }
+    private var lastMag = FloatArray(3) { 0f }
+    private var lastLight = 0f
+
+
 
     override fun onCreate() {
         super.onCreate()
@@ -90,11 +101,13 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
         accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        accelSensor?.let {
-            //sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST)
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
-        }
+        gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        magSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
 
+        listOfNotNull(accelSensor, gyroSensor, magSensor, lightSensor).forEach { sensor ->
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME)
+        }
     }
 
     private fun setupLocation() {
@@ -138,6 +151,66 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        event ?: return
+        val now = System.currentTimeMillis()
+
+        when (event.sensor.type) {
+            Sensor.TYPE_ACCELEROMETER -> {
+                lastAccel[0] = event.values[0]
+                lastAccel[1] = event.values[1]
+                //lastAccel[2] = event.values[2] - 9.81f // компенсируем гравитацию
+                lastAccel[2] = event.values[2]
+            }
+            Sensor.TYPE_GYROSCOPE -> {
+                lastGyro[0] = event.values[0]
+                lastGyro[1] = event.values[1]
+                lastGyro[2] = event.values[2]
+            }
+            Sensor.TYPE_MAGNETIC_FIELD -> {
+                lastMag[0] = event.values[0]
+                lastMag[1] = event.values[1]
+                lastMag[2] = event.values[2]
+            }
+            Sensor.TYPE_LIGHT -> {
+                lastLight = event.values[0]
+            }
+        }
+
+        // Отправляем данные акселерометра в UI (если нужно)
+        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER &&
+            now - lastUiBroadcastTs >= UI_BROADCAST_INTERVAL_MS) {
+            lastUiBroadcastTs = now
+            sendAccelDataBroadcast(lastAccel[0], lastAccel[1], lastAccel[2], now)
+        }
+
+        // Сохраняем в базу при наличии локации
+        lastKnownLocation?.let { location ->
+            val data = PotholeData(
+                timestamp = now,
+                latitude = location.latitude,
+                longitude = location.longitude,
+                accelX = lastAccel[0],
+                accelY = lastAccel[1],
+                accelZ = lastAccel[2],
+                gyroX = lastGyro[0],
+                gyroY = lastGyro[1],
+                gyroZ = lastGyro[2],
+                magX = lastMag[0],
+                magY = lastMag[1],
+                magZ = lastMag[2],
+                light = lastLight
+            )
+
+            batchData.add(data)
+
+            if (batchData.size >= 100 || now - lastSaveTime > SAVE_INTERVAL) {
+                flushBatch()
+                lastSaveTime = now
+            }
+        }
+    }
+
+    fun x_onSensorChanged(event: SensorEvent?) {
         event?.let {
             val currentLocation = lastKnownLocation
             // Отправляем данные акселерометра в реальном времени
