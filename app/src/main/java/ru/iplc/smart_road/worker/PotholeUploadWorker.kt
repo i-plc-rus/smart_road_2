@@ -111,9 +111,23 @@ class PotholeUploadWorker(
         fun writeCsvAndZip(context: Context, filename: String, rows: List<PotholeData>): File {
             val csvFile = File(context.cacheDir, "$filename.csv")
             csvFile.bufferedWriter().use { writer ->
-                writer.write("id,timestamp,lat,lon,x,y,z\n")
+                // Заголовок CSV
+                writer.write(
+                    "id,timestamp,lat,lon," +
+                            "accelX,accelY,accelZ," +
+                            "gyroX,gyroY,gyroZ," +
+                            "magX,magY,magZ," +
+                            "light,isSent\n"
+                )
+                // Данные
                 for (r in rows) {
-                    writer.write("${r.id},${r.timestamp},${r.latitude},${r.longitude},${r.accelX},${r.accelY},${r.accelZ}\n")
+                    writer.write(
+                        "${r.id},${r.timestamp},${r.latitude},${r.longitude}," +
+                                "${r.accelX},${r.accelY},${r.accelZ}," +
+                                "${r.gyroX},${r.gyroY},${r.gyroZ}," +
+                                "${r.magX},${r.magY},${r.magZ}," +
+                                "${r.light},${r.isSent}\n"
+                    )
                 }
             }
 
@@ -127,6 +141,7 @@ class PotholeUploadWorker(
             return zipFile
         }
     }
+
 
 
     companion object {
