@@ -82,8 +82,8 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        bottomNav.setupWithNavController(navController)
+//        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        //bottomNav.setupWithNavController(navController)
         val navView = findViewById<NavigationView>(R.id.nav_view)
         navView.setupWithNavController(navController)
 
@@ -285,7 +285,25 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Настройка BottomNavigation
-        binding.bottomNav.setupWithNavController(navController)
+//        binding.bottomNav.setupWithNavController(navController)
+
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    navController.navigate(R.id.nav_home)
+                    true
+                }
+                R.id.nav_garage -> {
+                    navController.navigate(R.id.nav_garage)
+                    true
+                }
+                R.id.nav_menu_bottom -> {
+                    openDrawer() // кастомное действие для "бургер"
+                    true
+                }
+                else -> false
+            }
+        }
 
         // Настройка NavigationView (правого меню)
         binding.navView.setupWithNavController(navController)

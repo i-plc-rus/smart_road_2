@@ -14,8 +14,8 @@ android {
         applicationId = "ru.iplc.smart_road"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2128
-        versionName = "2.1.28"
+        versionCode = 2129
+        versionName = "2.1.29"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
