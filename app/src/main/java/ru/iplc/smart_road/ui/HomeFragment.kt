@@ -76,16 +76,29 @@ class HomeFragment : Fragment() {
 
     private var lastCameraPosition: Point? = null
 
-
+    private var lastLat: Double? = null
+    private var lastLon: Double? = null
+    private var lastAzimuth: Float = 0f
 
     private val locationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == PotholeDataService.LOCATION_ACTION) {
                 val lat = intent.getDoubleExtra(PotholeDataService.EXTRA_LAT, 0.0)
                 val lon = intent.getDoubleExtra(PotholeDataService.EXTRA_LON, 0.0)
+
                 if (followUser) {
+                    var azimuth = lastAzimuth
+                    if (lastLat != null && lastLon != null) {
+                        azimuth = calculateBearing(lastLat!!, lastLon!!, lat, lon)
+                        // сглаживание, чтобы не дёргалось
+                        azimuth = (0.8f * lastAzimuth + 0.2f * azimuth)
+                    }
+                    lastLat = lat
+                    lastLon = lon
+                    lastAzimuth = azimuth
+
                     mapView.map.move(
-                        CameraPosition(Point(lat, lon), 17f, 0f, 0f)
+                        CameraPosition(Point(lat, lon), 17f, azimuth, 0f)
                     )
                 }
             }
@@ -148,18 +161,24 @@ class HomeFragment : Fragment() {
         })
 
         // Кнопка возврата к текущему местоположению
-        val goLocationButton = view?.findViewById<ImageButton>(R.id.go_location)
-        goLocationButton?.setOnClickListener {
+        binding.goLocation.setOnClickListener {
             followUser = true
-            // Сразу центрируем карту на последней известной позиции
             PotholeDataService.lastKnownLocation?.let {
-                mapView.map.move(CameraPosition(Point(it.latitude, it.longitude), 17f, 0f, 0f))
+                val azimuth = it.bearing.toFloat() // или 0f, если не нужен поворот
+                mapView.map.move(
+                    CameraPosition(
+                        Point(it.latitude, it.longitude),
+                        17f,
+                        azimuth,
+                        0f
+                    )
+                )
             }
         }
 
+
         // Слушаем изменение камеры, чтобы отключить слежение при ручном перемещении
         mapView.map.addCameraListener { map, position, reason, finished ->
-            // reason показывает причину движения камеры
             if (reason == CameraUpdateReason.GESTURES) {
                 followUser = false
             }
@@ -170,13 +189,13 @@ class HomeFragment : Fragment() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val location = PotholeDataService.lastKnownLocation ?: return
                 if (followUser) {
-                    val azimuth = location.bearing.toFloat() // направление движения в градусах
+                    val azimuth = location.bearing.toFloat() // направление движения
                     mapView.map.move(
                         CameraPosition(
                             Point(location.latitude, location.longitude),
                             17f,
-                            0f,
-                            azimuth // вот здесь задаем разворот камеры
+                            azimuth,
+                            0f
                         )
                     )
                 }
@@ -184,6 +203,13 @@ class HomeFragment : Fragment() {
         }, IntentFilter("LOCATION_UPDATE"))
     }
 
+    private fun calculateBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val dLon = Math.toRadians(lon2 - lon1)
+        val y = sin(dLon) * cos(Math.toRadians(lat2))
+        val x = cos(Math.toRadians(lat1)) * sin(Math.toRadians(lat2)) -
+                sin(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * cos(dLon)
+        return (Math.toDegrees(atan2(y, x)) + 360).rem(360).toFloat()
+    }
 
     private fun setupStatsPanel(view: View) {
         val statsCard = view.findViewById<MaterialCardView>(R.id.stats_card)

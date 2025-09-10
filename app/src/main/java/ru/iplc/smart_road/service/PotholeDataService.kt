@@ -119,8 +119,8 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
 
                 locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    10000L, // 5 секунд
-                    5f,
+                    500L,   // 0.5 секунды
+                    0f,     // любое смещение
                     this
                 )
 
