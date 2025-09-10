@@ -288,6 +288,12 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
 
     override fun onLocationChanged(location: Location) {
         lastKnownLocation = location
+        // Отправка координат через LocalBroadcast
+        val intent = Intent(LOCATION_ACTION).apply {
+            putExtra(EXTRA_LAT, location.latitude)
+            putExtra(EXTRA_LON, location.longitude)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     override fun onDestroy() {
@@ -347,6 +353,11 @@ class PotholeDataService : Service(), SensorEventListener, LocationListener {
         const val EXTRA_ACCEL_Y = "accel_y"
         const val EXTRA_ACCEL_Z = "accel_z"
         const val EXTRA_TIMESTAMP = "timestamp"
+
+        // Новая константа для передачи координат
+        const val LOCATION_ACTION = "ru.iplc.smart_road.LOCATION_ACTION"
+        const val EXTRA_LAT = "lat"
+        const val EXTRA_LON = "lon"
 
     }
 
