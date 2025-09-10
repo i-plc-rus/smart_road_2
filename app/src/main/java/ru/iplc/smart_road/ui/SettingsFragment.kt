@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.work.BackoffPolicy
@@ -51,6 +52,29 @@ class SettingsFragment : Fragment() {
     private val updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
+    val aboutText = """
+    <h2>О приложении «Умные дороги»</h2>
+    <p><b>Почему это важно?</b><br>
+    Плохое качество дорог — это не только дискомфорт, но и реальная опасность для каждого водителя... </p>
+
+    <h3>Наши амбициозные цели</h3>
+    <ul>
+        <li>Сократить количество ДТП на 10% — около 3,5 тысячи случаев в год</li>
+        <li>Уменьшить число пострадавших на 10% — около 4,7 тысячи человек</li>
+        <li>Снизить расходы на авто на 35% — около 30 тысяч рублей в год</li>
+        <li>Ускорить обработку заявок жителей в 4 раза</li>
+    </ul>
+
+    <h3>Для кого мы?</h3>
+    <p><b>B2C:</b> водители, курьеры, мотоциклисты...<br>
+       <b>B2B:</b> транспорт, логистика, страховые...<br>
+       <b>B2G:</b> органы власти, службы...</p>
+
+    <h3>Контакты</h3>
+    <p>t.me/smart_road | info@smart-roads.ru | smart-roads.ru</p>
+""".trimIndent()
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,32 +85,34 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        db = AppDatabase.getInstance(requireContext())
-        dao = db.potholeDao()
+        binding.tvAboutApp.text = HtmlCompat.fromHtml(aboutText, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
-        uiScope.launch {
-            while (isActive) {
-                val countInDb = withContext(Dispatchers.IO) { dao.getCount() }
-
-                // допустим, эти значения ты где-то сохраняешь
-                val sentCount = withContext(Dispatchers.IO) { dao.getSentCount() }
-                val newCount = withContext(Dispatchers.IO) { dao.getNewCount() }
-
-                val sendSpeed = sentCount - lastSent
-                val receiveSpeed = newCount - lastNew
-
-                lastSent = sentCount
-                lastNew = newCount
-
-                view.findViewById<TextView>(R.id.tvDbCount).text = "В базе: $countInDb"
-                view.findViewById<TextView>(R.id.tvSentCount).text = "Отправлено: $sentCount"
-                view.findViewById<TextView>(R.id.tvNewCount).text = "Буфер на отправку: $newCount"
-                view.findViewById<TextView>(R.id.tvSendSpeed).text = "Скорость отправки: $sendSpeed/с"
-                view.findViewById<TextView>(R.id.tvReceiveSpeed).text = "Скорость поступления: $receiveSpeed/с"
-
-                delay(1000) // обновление каждую секунду
-            }
-        }
+//        db = AppDatabase.getInstance(requireContext())
+//        dao = db.potholeDao()
+//
+//        uiScope.launch {
+//            while (isActive) {
+//                val countInDb = withContext(Dispatchers.IO) { dao.getCount() }
+//
+//                // допустим, эти значения ты где-то сохраняешь
+//                val sentCount = withContext(Dispatchers.IO) { dao.getSentCount() }
+//                val newCount = withContext(Dispatchers.IO) { dao.getNewCount() }
+//
+//                val sendSpeed = sentCount - lastSent
+//                val receiveSpeed = newCount - lastNew
+//
+//                lastSent = sentCount
+//                lastNew = newCount
+//
+//                view.findViewById<TextView>(R.id.tvDbCount).text = "В базе: $countInDb"
+//                view.findViewById<TextView>(R.id.tvSentCount).text = "Отправлено: $sentCount"
+//                view.findViewById<TextView>(R.id.tvNewCount).text = "Буфер на отправку: $newCount"
+//                view.findViewById<TextView>(R.id.tvSendSpeed).text = "Скорость отправки: $sendSpeed/с"
+//                view.findViewById<TextView>(R.id.tvReceiveSpeed).text = "Скорость поступления: $receiveSpeed/с"
+//
+//                delay(1000) // обновление каждую секунду
+//            }
+//        }
         setupToolbar()
     }
 

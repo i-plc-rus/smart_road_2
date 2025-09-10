@@ -43,6 +43,7 @@ import ru.iplc.smart_road.data.remote.ApiService
 import ru.iplc.smart_road.ui.view.StatsItemView
 import kotlin.math.*
 import com.yandex.mapkit.map.CameraUpdateReason
+import com.yandex.mapkit.Animation
 
 class HomeFragment : Fragment() {
 
@@ -91,19 +92,22 @@ class HomeFragment : Fragment() {
                     if (lastLat != null && lastLon != null) {
                         azimuth = calculateBearing(lastLat!!, lastLon!!, lat, lon)
                         // сглаживание, чтобы не дёргалось
-                        azimuth = (0.8f * lastAzimuth + 0.2f * azimuth)
+                        azimuth = smoothAzimuth(azimuth)
                     }
                     lastLat = lat
                     lastLon = lon
                     lastAzimuth = azimuth
 
                     mapView.map.move(
-                        CameraPosition(Point(lat, lon), 17f, azimuth, 0f)
+                        CameraPosition(Point(lat, lon), 17f, azimuth, 0f),
+                        com.yandex.mapkit.Animation(com.yandex.mapkit.Animation.Type.SMOOTH, 0.5f), // 0.5 секунды
+                        null
                     )
                 }
             }
         }
     }
+
 
 
     private val apiService: ApiService by lazy {
@@ -142,7 +146,7 @@ class HomeFragment : Fragment() {
         addFakeInitialData()
         startChartUpdates()
         observeAccelData()
-        loadPatternStats(view)
+        //loadPatternStats(view)
     }
 
     private fun setupMap() {
@@ -201,6 +205,12 @@ class HomeFragment : Fragment() {
                 }
             }
         }, IntentFilter("LOCATION_UPDATE"))
+    }
+
+
+    private fun smoothAzimuth(newAzimuth: Float): Float {
+        val diff = ((newAzimuth - lastAzimuth + 540) % 360) - 180 // разница от -180 до 180
+        return (lastAzimuth + diff * 0.1f + 360) % 360            // 0.1 = скорость поворота
     }
 
     private fun calculateBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
@@ -299,6 +309,11 @@ class HomeFragment : Fragment() {
         xAxis.isEnabled = false
 
         val yAxisLeft = accelChart.axisLeft
+
+        yAxisLeft.setDrawLabels(false)   // скрыть подписи значений
+        yAxisLeft.setDrawAxisLine(false) // скрыть линию оси
+
+
         yAxisLeft.isEnabled = true
         yAxisLeft.setDrawGridLines(true)
         yAxisLeft.axisMinimum = -20f
@@ -433,27 +448,27 @@ class HomeFragment : Fragment() {
         accelChart.invalidate()
     }
 
-    private fun loadPatternStats(view: View) {
-        val potholesView = view.findViewById<StatsItemView>(R.id.stats_potholes)
-        val bumpsView = view.findViewById<StatsItemView>(R.id.stats_speed_bumps)
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val response = apiService.getPatternStat()
-                if (response.isSuccessful) {
-                    val stats = response.body().orEmpty()
-                    val potholes = stats.find { it.type == "joint" }?.c ?: 0
-                    val speedBumps = stats.find { it.type == "speed_bump" }?.c ?: 0
-                    potholesView?.setStatValue(potholes.toString())
-                    bumpsView?.setStatValue(speedBumps.toString())
-                    Log.d(TAG, "Stats loaded: potholes=$potholes, speedBumps=$speedBumps")
-                } else {
-                    Log.w(TAG, "getPatternStat failed: ${response.code()}")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading stats", e)
-            }
-        }
-    }
+//    private fun loadPatternStats(view: View) {
+//        val potholesView = view.findViewById<StatsItemView>(R.id.stats_potholes)
+//        val bumpsView = view.findViewById<StatsItemView>(R.id.stats_speed_bumps)
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            try {
+//                val response = apiService.getPatternStat()
+//                if (response.isSuccessful) {
+//                    val stats = response.body().orEmpty()
+//                    val potholes = stats.find { it.type == "joint" }?.c ?: 0
+//                    val speedBumps = stats.find { it.type == "speed_bump" }?.c ?: 0
+//                    potholesView?.setStatValue(potholes.toString())
+//                    bumpsView?.setStatValue(speedBumps.toString())
+//                    Log.d(TAG, "Stats loaded: potholes=$potholes, speedBumps=$speedBumps")
+//                } else {
+//                    Log.w(TAG, "getPatternStat failed: ${response.code()}")
+//                }
+//            } catch (e: Exception) {
+//                Log.e(TAG, "Error loading stats", e)
+//            }
+//        }
+//    }
 
     override fun onStart() {
         super.onStart()

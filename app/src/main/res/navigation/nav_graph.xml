@@ -23,6 +23,11 @@
         android:label="Настройки" />
 
     <fragment
+        android:id="@+id/nav_contacts"
+        android:name="ru.iplc.smart_road.ui.ContactsFragment"
+        android:label="Контакты" />
+
+    <fragment
         android:id="@+id/nav_bill"
         android:name="ru.iplc.smart_road.ui.BillingHistoryFragment"
         android:label="Биллинг" />

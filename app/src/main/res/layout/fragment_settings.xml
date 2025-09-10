@@ -17,58 +17,80 @@
 
 
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize">
+<!--<LinearLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:orientation="vertical"-->
+<!--    android:padding="16dp"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:layout_marginTop="?attr/actionBarSize">-->
 
 
 
-    <TextView
-        android:id="@+id/version"
-        android:text="v 2.1.30"
-        android:textSize="18sp"
+<!--    <TextView-->
+<!--        android:id="@+id/version"-->
+<!--        android:text="v 2.1.30"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvDbCount"-->
+<!--        android:text="В базе: 0"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvSentCount"-->
+<!--        android:text="Отправлено: 0"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvNewCount"-->
+<!--        android:text="Буфер на отправку: 0"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvSendSpeed"-->
+<!--        android:text="Скорость отправки: 0/с"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/tvReceiveSpeed"-->
+<!--        android:text="Скорость поступления: 0/с"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+<!--</LinearLayout>-->
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
 
-    <TextView
-        android:id="@+id/tvDbCount"
-        android:text="В базе: 0"
-        android:textSize="18sp"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="12dp">
 
-    <TextView
-        android:id="@+id/tvSentCount"
-        android:text="Отправлено: 0"
-        android:textSize="18sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tvNewCount"
-        android:text="Буфер на отправку: 0"
-        android:textSize="18sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tvSendSpeed"
-        android:text="Скорость отправки: 0/с"
-        android:textSize="18sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/tvReceiveSpeed"
-        android:text="Скорость поступления: 0/с"
-        android:textSize="18sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        <TextView
+            android:id="@+id/tvAboutApp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="4dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+    </ScrollView>
 </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

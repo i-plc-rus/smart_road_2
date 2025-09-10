@@ -96,6 +96,11 @@ class MainActivity : AppCompatActivity() {
                     binding.drawerLayout.closeDrawer(navView)
                     true
                 }
+                R.id.nav_contacts -> {
+                    navController.navigate(R.id.nav_contacts)
+                    binding.drawerLayout.closeDrawer(navView)
+                    true
+                }
                 R.id.nav_profile -> {
                     val app = application as SmartRoadApp
 
