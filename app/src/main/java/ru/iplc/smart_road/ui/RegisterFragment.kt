@@ -46,7 +46,7 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        binding.toolbarRegister.apply {
+        binding.toolbarSettings.apply {
             //title = getString(R.string.register_title)
             title = "Регистрация"
             setNavigationOnClickListener {

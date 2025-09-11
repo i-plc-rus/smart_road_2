@@ -55,7 +55,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        binding.toolbarGarage.apply {
+        binding.toolbarSettings.apply {
             title = "Профиль"
             setNavigationOnClickListener {
                 findNavController().navigate(R.id.nav_home)

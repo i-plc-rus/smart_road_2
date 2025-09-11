@@ -2,183 +2,104 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <FrameLayout
+
+    <!-- Вертикальный контейнер: карта + гармошка -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <!-- Карта -->
-    <com.yandex.mapkit.mapview.MapView
-        android:id="@+id/map_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:gravity="center_vertical">-->
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-<!--            <ProgressBar-->
-<!--                android:id="@+id/location_progress"-->
-<!--                android:layout_width="16dp"-->
-<!--                android:layout_height="16dp"-->
-<!--                android:layout_marginEnd="8dp"/>-->
+        <!-- Карта (будет сжиматься при раскрытии гармошки) -->
+        <com.yandex.mapkit.mapview.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-<!--            <TextView-->
-<!--                android:id="@+id/location_status"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text=""-->
-<!--                android:textSize="12sp"/>-->
-<!--        </LinearLayout>-->
-
-    </FrameLayout>
-    <!-- Разворачивающаяся панель статистики -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/stats_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_margin="8dp"
-        app:cardElevation="4dp"
-        app:cardCornerRadius="12dp">
-
-        <LinearLayout
+        <!-- Разворачивающаяся панель -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/stats_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_margin="8dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp">
 
-            <!-- Шапка с заголовком и стрелкой -->
             <LinearLayout
-                android:id="@+id/stats_header"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:background="?attr/colorSurfaceVariant">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:text="Статистика"
-                    android:textColor="?attr/colorOnSurface"
-                    android:gravity="center_vertical"
-                    />
-
-                <ImageView
-                    android:id="@+id/expand_arrow"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_down"
-                    app:tint="?attr/colorOnSurface"
-                    android:contentDescription="Развернуть"/>
-            </LinearLayout>
-
-            <!-- Контент (скрыт по умолчанию) -->
-            <LinearLayout
-                android:id="@+id/stats_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp"
-                android:visibility="gone">
+                android:orientation="vertical">
 
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal">-->
-
-<!--                &lt;!&ndash; Плитки с цифрами &ndash;&gt;-->
-<!--                <ru.iplc.smart_road.ui.view.StatsItemView-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    app:statValue="11"-->
-<!--                    app:statLabel="паттернов"/>-->
-
-<!--                <ru.iplc.smart_road.ui.view.StatsItemView-->
-<!--                    android:id="@+id/stats_potholes"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    app:statValue="0"-->
-<!--                    app:statLabel="ямы"/>-->
-
-<!--                <ru.iplc.smart_road.ui.view.StatsItemView-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    app:statValue="0"-->
-<!--                    app:statLabel="агрессия"/>-->
-
-<!--                <ru.iplc.smart_road.ui.view.StatsItemView-->
-<!--                    android:id="@+id/stats_speed_bumps"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    app:statValue="0"-->
-<!--                    app:statLabel="искусственная неровность"/>-->
-<!--            </LinearLayout>-->
-
-                <FrameLayout
+                <!-- Шапка -->
+                <LinearLayout
+                    android:id="@+id/stats_header"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_margin="8dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:background="?attr/colorSurfaceVariant">
 
-                    <!-- Сам график -->
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/accel_chart"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-
-                    <!-- Легенда поверх графика в нижнем правом углу -->
-                    <ImageView
-                        android:id="@+id/accel_legend"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_margin="8dp"
-                        android:src="@drawable/accel_legend"
-                        android:contentDescription="Легенда ускорений"/>
-                </FrameLayout>
+                        android:layout_weight="1"
+                        android:text="Статистика"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSurface"/>
 
+                    <ImageView
+                        android:id="@+id/expand_arrow"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_down"
+                        app:tint="?attr/colorOnSurface"
+                        android:contentDescription="Развернуть"/>
+                </LinearLayout>
+
+                <!-- Контент -->
+                <LinearLayout
+                    android:id="@+id/stats_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:visibility="gone">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_margin="8dp">
+
+                        <!-- График -->
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/accel_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                        <!-- Легенда -->
+                        <ImageView
+                            android:id="@+id/accel_legend"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:layout_margin="8dp"
+                            android:src="@drawable/accel_legend"/>
+                    </FrameLayout>
+                </LinearLayout>
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-
-
-    <!-- Остальные элементы (правая панель) -->
-    <!-- Правая панель: меню + кнопки -->
+    <!-- Правая панель поверх карты и гармошки -->
     <LinearLayout
         android:id="@+id/right_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:orientation="vertical"
-        android:gravity="end">
-
-        <!-- Меню (бургер) -->
-<!--        <FrameLayout-->
-<!--            android:layout_width="52dp"-->
-<!--            android:layout_height="52dp"-->
-<!--            android:background="@drawable/icon_background"-->
-<!--            android:layout_marginBottom="50dp">-->
-
-<!--&lt;!&ndash;            <ImageButton&ndash;&gt;-->
-<!--&lt;!&ndash;                android:id="@+id/burger_icon"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_width="32dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_height="32dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_gravity="center"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:src="@drawable/ic_menu"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:background="@android:color/transparent"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:contentDescription="Menu" />&ndash;&gt;-->
-<!--        </FrameLayout>-->
+        android:gravity="end"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp">
 
         <FrameLayout
             android:layout_width="52dp"
@@ -193,8 +114,7 @@
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/telemetry_toggle_selector"
-                android:contentDescription="Управление отправкой телеметрии"
-                android:scaleType="centerInside"/>
+                android:contentDescription="Управление телеметрией"/>
         </FrameLayout>
 
         <FrameLayout
@@ -210,11 +130,7 @@
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/outline_adjust_24"
-                android:contentDescription="Перейти к локации"
-                android:scaleType="centerInside"/>
+                android:contentDescription="Перейти к локации"/>
         </FrameLayout>
-
-
-
     </LinearLayout>
 </FrameLayout>

@@ -48,14 +48,14 @@ class BillingHistoryFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = PaymentsAdapter(payments)
-        setupToolbar()
+        //setupToolbar()
     }
-    private fun setupToolbar() {
-        binding.toolbarBill.apply {
-            title = "Биллинг"
-            setNavigationOnClickListener {
-                findNavController().navigate(R.id.nav_home)
-            }
-        }
-    }
+//    private fun setupToolbar() {
+//        binding.toolbarBill.apply {
+//            title = "Биллинг"
+//            setNavigationOnClickListener {
+//                findNavController().navigate(R.id.nav_home)
+//            }
+//        }
+//    }
 }

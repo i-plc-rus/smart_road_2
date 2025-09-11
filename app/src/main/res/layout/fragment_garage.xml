@@ -5,13 +5,14 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarGarage"
+        android:id="@+id/toolbarSettings"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:titleTextColor="?attr/colorOnPrimary"
+        android:background="?attr/colorOnPrimary"
+        app:titleTextColor="?attr/colorPrimary"
         app:navigationIcon="?attr/homeAsUpIndicator"
-        app:navigationIconTint="?attr/colorOnPrimary"/>
+        app:navigationIconTint="?attr/colorPrimary"
+        />
 
     <LinearLayout
         android:id="@+id/emptyState"

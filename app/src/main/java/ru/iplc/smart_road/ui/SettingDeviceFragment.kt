@@ -58,7 +58,7 @@ class SettingDeviceFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        binding.toolbarSettingDevice.apply {
+        binding.toolbarSettings.apply {
             title = "Способ установки"
             setNavigationOnClickListener {
                 findNavController().navigate(R.id.nav_home)

@@ -9,10 +9,10 @@
         android:id="@+id/toolbarSettings"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:titleTextColor="?attr/colorOnPrimary"
+        android:background="?attr/colorOnPrimary"
+        app:titleTextColor="?attr/colorPrimary"
         app:navigationIcon="?attr/homeAsUpIndicator"
-        app:navigationIconTint="?attr/colorOnPrimary"
+        app:navigationIconTint="?attr/colorPrimary"
         />
 
 
@@ -89,7 +89,12 @@
             android:layout_height="wrap_content"
             android:lineSpacingExtra="4dp"
             android:textSize="16sp"
-            android:textColor="@android:color/black" />
+            android:scrollHorizontally="false"
+            android:singleLine="false"
+            android:inputType="textMultiLine"
+            android:breakStrategy="simple"
+            android:ellipsize="none"
+            />
     </ScrollView>
 </LinearLayout>
 
