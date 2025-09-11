@@ -21,14 +21,16 @@
             android:id="@+id/stats_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="0dp"
             app:cardElevation="4dp"
-            app:cardCornerRadius="12dp">
+            app:cardCornerRadius="0dp"
+            app:cardBackgroundColor="?attr/colorSurface">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@android:color/transparent">
 
                 <!-- Шапка -->
                 <LinearLayout
@@ -37,13 +39,14 @@
                     android:layout_height="48dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="12dp"
-                    android:background="?attr/colorSurfaceVariant">
+                    android:background="@android:color/transparent"
+                    >
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_margin="8dp"
                         android:text="Статистика"
                         android:textSize="16sp"
                         android:textColor="?attr/colorOnSurface"/>

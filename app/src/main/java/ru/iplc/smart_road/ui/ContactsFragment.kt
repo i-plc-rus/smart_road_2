@@ -41,7 +41,7 @@ class ContactsFragment  : Fragment() {
     <p>Мы создаём инновационную систему для общей безопасности, экономии и комфорта на дорогах России. 
     Готовы ответить на вопросы и надеемся на вашу поддержку!</p>
 
-    <p><b>Юрий Струк:</b> +7 (909) 668-69-96, <a href="https://t.me/omhotey">t.me/omhotey</a></p>
+    <p><b>Юрий Струк:</b><br> +7 (909) 668-69-96, <br> <a href="https://t.me/omhotey">t.me/omhotey</a></p>
 
     <p><b>Группа в Telegram:</b> <a href="https://t.me/smart_road">t.me/smart_road</a></p>
 
